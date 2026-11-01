@@ -16,6 +16,7 @@ export const Navbar: React.FC = () => {
         </div>
         <div style={{ display: 'flex', gap: '16px' }}>
           <Link to="/">My Shelf ({books.length})</Link>
+          <Link to="/catalogs">All Catalogs</Link>
           <Link to="/search">Search Books</Link>
         </div>
       </div>
