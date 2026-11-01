@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Navbar } from './components/Navbar.tsx';
 import { Home } from './pages/Home.tsx';
 import { Search } from './pages/Search.tsx';
+import { Catalogs } from './pages/Catalogs.tsx';
 import { BookDetail } from './pages/BookDetail.tsx';
 import { Reader } from './pages/Reader.tsx';
 
@@ -26,6 +27,7 @@ const AppLayout: React.FC = () => {
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/catalogs" element={<Catalogs />} />
           <Route path="/search" element={<Search />} />
           <Route path="/book/:key" element={<BookDetail />} />
           <Route path="/read/:key" element={<Reader />} />
