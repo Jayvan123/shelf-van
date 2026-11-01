@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { BookOpen, Search as SearchIcon, X, ArrowRight } from 'lucide-react';
 import { useBookSearch, useSubjectBooks } from '../api/hooks.ts';
 import { BookCard } from '../components/BookCard.tsx';
 
-const POPULAR_CATALOGS = [
-  { label: '📜 Classic Literature', subject: 'classic_literature' },
-  { label: '🚀 Science Fiction', subject: 'science_fiction' },
-  { label: '🧙 Fantasy', subject: 'fantasy' },
-  { label: '🕵️ Mystery & Detective', subject: 'mystery_and_detective_stories' },
-  { label: '🏛️ History', subject: 'history' },
-  { label: '🧠 Philosophy', subject: 'philosophy' },
-  { label: '💖 Romance', subject: 'romance' },
-  { label: '🧸 Children', subject: 'children' },
-  { label: '🎭 Plays & Drama', subject: 'plays' },
+const STORE_CATEGORIES = [
+  { label: 'New arrivals', subject: 'new_arrivals', query: 'year:[2020 TO 2026]' },
+  { label: 'Classics', subject: 'classic_literature' },
+  { label: 'Sci-Fi', subject: 'science_fiction' },
+  { label: 'Fantasy', subject: 'fantasy' },
+  { label: 'Mystery', subject: 'mystery_and_detective_stories' },
+  { label: 'History', subject: 'history' },
+  { label: 'Philosophy', subject: 'philosophy' },
+  { label: 'Romance', subject: 'romance' },
+  { label: 'Children', subject: 'children' },
+  { label: 'Drama', subject: 'plays' },
 ];
 
 export const Search: React.FC = () => {
@@ -21,14 +23,14 @@ export const Search: React.FC = () => {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
-  // Default to 'classic_literature' if no search or catalog is specified, so books with covers load immediately!
-  const [selectedCatalog, setSelectedCatalog] = useState<string | null>(catalogParam || 'classic_literature');
+  // Default to 'classic_literature'
+  const [selectedCategory, setSelectedCategory] = useState<string>(catalogParam || 'classic_literature');
   const [page, setPage] = useState(1);
 
   // Sync catalogParam from URL when navigating from All Catalogs
   useEffect(() => {
     if (catalogParam) {
-      setSelectedCatalog(catalogParam);
+      setSelectedCategory(catalogParam);
       setSearchTerm('');
       setDebouncedQuery('');
       setPage(1);
@@ -40,7 +42,6 @@ export const Search: React.FC = () => {
     const handler = setTimeout(() => {
       setDebouncedQuery(searchTerm);
       if (searchTerm.trim()) {
-        setSelectedCatalog(null); // Clear catalog when typing search
         if (searchParams.get('catalog')) {
           setSearchParams({});
         }
@@ -52,155 +53,282 @@ export const Search: React.FC = () => {
   }, [searchTerm, searchParams, setSearchParams]);
 
   const searchQuery = useBookSearch(debouncedQuery, page);
-  const subjectQuery = useSubjectBooks(selectedCatalog || undefined, page);
+  const subjectQuery = useSubjectBooks(selectedCategory, page);
 
-  const isBrowsingCatalog = Boolean(selectedCatalog && !debouncedQuery.trim());
-  const activeQuery = isBrowsingCatalog ? subjectQuery : searchQuery;
+  const isCustomSearch = Boolean(debouncedQuery.trim());
+  const activeQuery = isCustomSearch ? searchQuery : subjectQuery;
 
   const { data, isLoading, isError, error, isFetching } = activeQuery;
 
-  const handleSelectCatalog = (subject: string) => {
+  const handleCategoryClick = (subject: string) => {
     setSearchTerm('');
     setDebouncedQuery('');
-    setSelectedCatalog(subject);
+    setSelectedCategory(subject);
     setSearchParams({ catalog: subject });
     setPage(1);
   };
 
+  const currentCategoryLabel =
+    STORE_CATEGORIES.find((c) => c.subject === selectedCategory)?.label ||
+    selectedCategory.replace(/_/g, ' ');
+
   return (
-    <div style={{ padding: '0 16px', maxWidth: '1200px', margin: '0 auto' }}>
-      <h2>Book Discovery & Catalog</h2>
-
-      {/* Catalogs List / Genre Chips */}
-      <div style={{ margin: '16px 0' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-          <strong>Browse Catalogs by Genre:</strong>
-          <Link to="/catalogs" style={{ fontSize: '0.9rem' }}>
-            View All 50+ Genres &rarr;
-          </Link>
-        </div>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          {POPULAR_CATALOGS.map((cat) => {
-            const isSelected = selectedCatalog === cat.subject && !debouncedQuery.trim();
-            return (
-              <button
-                key={cat.subject}
-                onClick={() => handleSelectCatalog(cat.subject)}
-                style={{
-                  backgroundColor: isSelected ? '#1a73e8' : '#f0f0f0',
-                  color: isSelected ? '#fff' : '#333',
-                  fontWeight: isSelected ? 'bold' : 'normal',
-                }}
-              >
-                {cat.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <hr style={{ border: 'none', borderTop: '1px solid #eee', margin: '16px 0' }} />
-
-      {/* Search Input Bar */}
-      <div style={{ margin: '16px 0', display: 'flex', gap: '8px', alignItems: 'center' }}>
-        <input
-          type="text"
-          placeholder="Or type a book title, author, or subject..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={{ width: '380px', maxWidth: '100%', padding: '8px' }}
-        />
-        {searchTerm && (
-          <button onClick={() => { setSearchTerm(''); setDebouncedQuery(''); setSelectedCatalog('classic_literature'); }}>
-            Clear Search
-          </button>
-        )}
-        {isFetching && <span style={{ fontSize: '0.85rem', color: '#666' }}>Fetching covers...</span>}
-      </div>
-
-      {/* Error state */}
-      {isError && (
-        <div style={{ padding: '12px', background: '#ffebee', color: '#c62828', marginBottom: '16px', border: '1px solid #ef9a9a', borderRadius: '4px' }}>
-          <strong>Notice:</strong> {error instanceof Error ? error.message : 'Failed to retrieve books.'}
-        </div>
-      )}
-
-      {/* Loading Skeleton / State */}
-      {isLoading && (
-        <div style={{ marginTop: '24px', textAlign: 'center', padding: '32px 0' }}>
-          <p>Loading book covers from Open Library via BFF proxy...</p>
-        </div>
-      )}
-
-      {/* Book Covers Grid */}
-      {data && (
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '16px 0' }}>
-            <p style={{ margin: 0, color: '#444' }}>
-              {isBrowsingCatalog ? (
-                <>Showing catalog: <strong>{POPULAR_CATALOGS.find(c => c.subject === selectedCatalog)?.label || selectedCatalog}</strong> ({data.total} books)</>
-              ) : (
-                <>Found <strong>{data.total}</strong> results for "{debouncedQuery}"</>
-              )}{' '}
-              - Page {data.page}
-            </p>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button
-                disabled={page <= 1 || isFetching}
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-              >
-                &larr; Previous Page
-              </button>
-              <button
-                disabled={data.books.length < 20 || isFetching}
-                onClick={() => setPage((p) => p + 1)}
-              >
-                Next Page &rarr;
-              </button>
-            </div>
+    <div style={{ backgroundColor: '#fff', minHeight: '90vh' }}>
+      {/* Category Tabs Bar matching reference image */}
+      <div style={{ borderBottom: '1px solid #ededed', backgroundColor: '#fff' }}>
+        <div
+          style={{
+            maxWidth: '1280px',
+            margin: '0 auto',
+            padding: '0 24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '16px',
+            overflowX: 'auto',
+          }}
+          className="hide-scrollbar"
+        >
+          {/* Category Tabs */}
+          <div style={{ display: 'flex', gap: '24px', whiteSpace: 'nowrap' }}>
+            {STORE_CATEGORIES.map((cat) => {
+              const isActive = !isCustomSearch && selectedCategory === cat.subject;
+              return (
+                <button
+                  key={cat.subject}
+                  onClick={() => handleCategoryClick(cat.subject)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    padding: '14px 2px',
+                    fontSize: '0.92rem',
+                    fontWeight: isActive ? '700' : '500',
+                    color: isActive ? '#ff5436' : '#555',
+                    borderBottom: isActive ? '2px solid #ff5436' : '2px solid transparent',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {cat.label}
+                </button>
+              );
+            })}
           </div>
 
-          {data.books.length === 0 ? (
-            <p style={{ padding: '32px 0', textAlign: 'center', color: '#666' }}>
-              No books found. Try selecting another catalog or a different search term.
-            </p>
-          ) : (
-            <div
+          {/* Link to All 50+ Catalogs */}
+          <Link
+            to="/catalogs"
+            style={{
+              fontSize: '0.85rem',
+              color: '#888',
+              whiteSpace: 'nowrap',
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '6px 0',
+            }}
+          >
+            All Genres
+            <ArrowRight size={13} />
+          </Link>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <main style={{ maxWidth: '1280px', margin: '0 auto', padding: '24px 24px 60px 24px' }}>
+        {/* Title & Search Bar Row */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '16px',
+            marginBottom: '28px',
+          }}
+        >
+          {/* Section Heading matching reference image: 📖 New arrivals */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <BookOpen size={24} color="#1a1a1a" />
+            <h1
               style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-                gap: '20px',
-                marginTop: '16px',
+                fontSize: '1.45rem',
+                fontWeight: '800',
+                letterSpacing: '-0.4px',
+                color: '#1a1a1a',
+                textTransform: 'capitalize',
+                margin: 0,
               }}
             >
-              {data.books.map((book) => (
-                <BookCard key={book.key} book={book} />
-              ))}
-            </div>
-          )}
-
-          {/* Bottom Pagination */}
-          {data.books.length > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '32px', paddingBottom: '32px' }}>
-              <button
-                disabled={page <= 1 || isFetching}
-                onClick={() => { setPage((p) => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-              >
-                &larr; Previous Page
-              </button>
-              <span style={{ display: 'flex', alignItems: 'center', fontSize: '0.9rem', color: '#666' }}>
-                Page {data.page}
+              {isCustomSearch ? `Search: "${debouncedQuery}"` : currentCategoryLabel}
+            </h1>
+            {data && (
+              <span style={{ fontSize: '0.85rem', color: '#999', marginLeft: '6px' }}>
+                ({data.total.toLocaleString()} books)
               </span>
+            )}
+          </div>
+
+          {/* Minimalist Search Input */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: '#f5f5f5',
+              borderRadius: '24px',
+              padding: '6px 14px',
+              width: '320px',
+              maxWidth: '100%',
+              border: '1px solid #ebebeb',
+            }}
+          >
+            <SearchIcon size={16} color="#888" style={{ marginRight: '8px' }} />
+            <input
+              type="text"
+              placeholder="Search books, authors, ISBN..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                outline: 'none',
+                fontSize: '0.88rem',
+                width: '100%',
+                color: '#1a1a1a',
+              }}
+            />
+            {searchTerm && (
               <button
-                disabled={data.books.length < 20 || isFetching}
-                onClick={() => { setPage((p) => p + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                onClick={() => { setSearchTerm(''); setDebouncedQuery(''); }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
               >
-                Next Page &rarr;
+                <X size={15} color="#888" />
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      )}
+
+        {/* Error notification */}
+        {isError && (
+          <div
+            style={{
+              padding: '16px',
+              backgroundColor: '#fff3f0',
+              border: '1px solid #ffccba',
+              borderRadius: '8px',
+              color: '#d32f2f',
+              marginBottom: '24px',
+              fontSize: '0.9rem',
+            }}
+          >
+            {error instanceof Error ? error.message : 'Failed to load books.'}
+          </div>
+        )}
+
+        {/* Loading State Skeleton */}
+        {isLoading && (
+          <div style={{ textAlign: 'center', padding: '60px 0', color: '#888' }}>
+            <div style={{ fontSize: '1.8rem', marginBottom: '12px' }}>📖</div>
+            <p style={{ fontSize: '0.95rem' }}>Loading book collection from Open Library...</p>
+          </div>
+        )}
+
+        {/* 5-Column Responsive Book Covers Grid matching reference image */}
+        {data && (
+          <div>
+            {data.books.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '60px 0', color: '#888' }}>
+                <p style={{ fontSize: '1.05rem', marginBottom: '8px' }}>No books found.</p>
+                <button
+                  onClick={() => { setSearchTerm(''); setDebouncedQuery(''); setSelectedCategory('classic_literature'); }}
+                  style={{
+                    backgroundColor: '#ff5436',
+                    color: '#fff',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Explore Classics
+                </button>
+              </div>
+            ) : (
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))',
+                  gap: '32px 24px',
+                }}
+              >
+                {data.books.map((book) => (
+                  <BookCard key={book.key} book={book} />
+                ))}
+              </div>
+            )}
+
+            {/* Pagination Controls */}
+            {data.books.length > 0 && (
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '16px',
+                  marginTop: '48px',
+                  paddingTop: '24px',
+                  borderTop: '1px solid #f0f0f0',
+                }}
+              >
+                <button
+                  disabled={page <= 1 || isFetching}
+                  onClick={() => {
+                    setPage((p) => Math.max(1, p - 1));
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    border: '1px solid #ddd',
+                    backgroundColor: '#fff',
+                    cursor: page > 1 ? 'pointer' : 'not-allowed',
+                    opacity: page > 1 ? 1 : 0.5,
+                    fontWeight: '600',
+                    fontSize: '0.85rem',
+                  }}
+                >
+                  &larr; Previous Page
+                </button>
+
+                <span style={{ fontSize: '0.9rem', color: '#666', fontWeight: '500' }}>
+                  Page {data.page}
+                </span>
+
+                <button
+                  disabled={data.books.length < 20 || isFetching}
+                  onClick={() => {
+                    setPage((p) => p + 1);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    border: '1px solid #ddd',
+                    backgroundColor: '#fff',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                    fontSize: '0.85rem',
+                  }}
+                >
+                  Next Page &rarr;
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </main>
     </div>
   );
 };
