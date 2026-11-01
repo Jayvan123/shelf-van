@@ -1,0 +1,258 @@
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+import { logger } from 'hono/logger';
+import { cacheStore, TTL_SEARCH, TTL_BOOK_DETAIL } from './cache.js';
+import {
+  fetchFromOpenLibrary,
+  OpenLibraryError,
+  RateLimitError,
+  NotFoundError,
+} from './client.js';
+import {
+  extractCleanKey,
+  normalizeSearchResponse,
+  normalizeSubjectResponse,
+  normalizeBookDetail,
+  type OpenLibrarySearchRawResponse,
+  type OpenLibrarySubjectRawResponse,
+} from './normalizers.js';
+import type { BookDetail, SearchResponse } from './types.js';
+
+export const app = new Hono();
+
+// Middlewares
+app.use('*', logger());
+app.use(
+  '*',
+  cors({
+    origin: '*',
+    allowMethods: ['GET', 'POST', 'OPTIONS'],
+    allowHeaders: ['Content-Type', 'Accept', 'Authorization'],
+  })
+);
+
+// Health check
+app.get('/api/health', (c) => {
+  return c.json({ status: 'ok', service: 'ShelfVan BFF', timestamp: new Date().toISOString() });
+});
+
+// GET /api/search?q={query}&page={page}
+app.get('/api/search', async (c) => {
+  const query = c.req.query('q') || '';
+  const pageStr = c.req.query('page') || '1';
+  const page = Math.max(1, parseInt(pageStr, 10) || 1);
+
+  const trimmedQuery = query.trim();
+  if (!trimmedQuery) {
+    const emptyResponse: SearchResponse = { total: 0, page: 1, books: [] };
+    return c.json(emptyResponse);
+  }
+
+  const cacheKey = `search:${trimmedQuery.toLowerCase()}:${page}`;
+  const cached = cacheStore.get<SearchResponse>(cacheKey);
+  if (cached) {
+    console.log(`[Cache Hit] Search: "${trimmedQuery}" (Page ${page})`);
+    return c.json(cached);
+  }
+
+  try {
+    const path = `/search.json?q=${encodeURIComponent(trimmedQuery)}&page=${page}&limit=20`;
+    const raw = await fetchFromOpenLibrary<OpenLibrarySearchRawResponse>(path);
+    const normalized = normalizeSearchResponse(raw, page);
+
+    cacheStore.set(cacheKey, normalized, TTL_SEARCH);
+    return c.json(normalized);
+  } catch (err: unknown) {
+    if (err instanceof RateLimitError) {
+      return c.json({ error: err.message, code: 'RATE_LIMITED' }, 429);
+    }
+    if (err instanceof OpenLibraryError) {
+      return c.json({ error: err.message, code: 'OPEN_LIBRARY_ERROR' }, err.status as 400 | 500);
+    }
+    return c.json({ error: 'Internal server error while searching', code: 'INTERNAL_ERROR' }, 500);
+  }
+});
+
+// GET /api/subjects/:subject?page={page}
+app.get('/api/subjects/:subject', async (c) => {
+  const rawSubject = c.req.param('subject') || '';
+  const cleanSubject = rawSubject.toLowerCase().trim().replace(/\s+/g, '_');
+  const pageStr = c.req.query('page') || '1';
+  const page = Math.max(1, parseInt(pageStr, 10) || 1);
+
+  if (!cleanSubject) {
+    return c.json({ total: 0, page: 1, books: [] } satisfies SearchResponse);
+  }
+
+  const cacheKey = `subject:${cleanSubject}:${page}`;
+  const cached = cacheStore.get<SearchResponse>(cacheKey);
+  if (cached) {
+    console.log(`[Cache Hit] Subject: "${cleanSubject}" (Page ${page})`);
+    return c.json(cached);
+  }
+
+  try {
+    const offset = (page - 1) * 20;
+    const path = `/subjects/${encodeURIComponent(cleanSubject)}.json?limit=20&offset=${offset}`;
+    const raw = await fetchFromOpenLibrary<OpenLibrarySubjectRawResponse>(path);
+    const normalized = normalizeSubjectResponse(raw, page);
+
+    cacheStore.set(cacheKey, normalized, TTL_SEARCH);
+    return c.json(normalized);
+  } catch (err: unknown) {
+    if (err instanceof RateLimitError) {
+      return c.json({ error: err.message, code: 'RATE_LIMITED' }, 429);
+    }
+    if (err instanceof OpenLibraryError) {
+      return c.json({ error: err.message, code: 'OPEN_LIBRARY_ERROR' }, err.status as 400 | 500);
+    }
+    return c.json({ error: 'Failed to retrieve catalog books', code: 'INTERNAL_ERROR' }, 500);
+  }
+});
+
+// GET /api/books/:key
+app.get('/api/books/:key', async (c) => {
+  const rawKey = c.req.param('key');
+  const cleanKey = extractCleanKey(rawKey);
+
+  if (!cleanKey) {
+    return c.json({ error: 'Missing book key', code: 'BAD_REQUEST' }, 400);
+  }
+
+  const cacheKey = `book:${cleanKey}`;
+  const cached = cacheStore.get<BookDetail>(cacheKey);
+  if (cached) {
+    console.log(`[Cache Hit] Book Detail: "${cleanKey}"`);
+    return c.json(cached);
+  }
+
+  try {
+    const isEdition = cleanKey.toUpperCase().endsWith('M');
+    let workData: Record<string, unknown> = {};
+    let topEdition: Record<string, unknown> | null = null;
+    let authorNames: string[] = [];
+    let iaFallback: string | undefined;
+
+    if (isEdition) {
+      // Direct edition lookup
+      const editionRaw = await fetchFromOpenLibrary<Record<string, unknown>>(`/books/${cleanKey}.json`);
+      topEdition = editionRaw;
+      workData = editionRaw;
+
+      // If work link exists, fetch work data for description/subjects
+      if (Array.isArray(editionRaw.works) && editionRaw.works.length > 0) {
+        const workRef = editionRaw.works[0] as { key?: string };
+        if (workRef?.key) {
+          try {
+            const workClean = extractCleanKey(workRef.key);
+            const parentWork = await fetchFromOpenLibrary<Record<string, unknown>>(`/works/${workClean}.json`);
+            if (parentWork) {
+              workData = { ...editionRaw, ...parentWork };
+            }
+          } catch {
+            // Non-critical if work fetch fails
+          }
+        }
+      }
+    } else {
+      // Work level lookup
+      workData = await fetchFromOpenLibrary<Record<string, unknown>>(`/works/${cleanKey}.json`);
+
+      // Fetch editions (up to 25) to find publishers, page counts, and an IA scan
+      try {
+        const editionsRaw = await fetchFromOpenLibrary<{ entries?: Record<string, unknown>[] }>(
+          `/works/${cleanKey}/editions.json?limit=25`
+        );
+        if (Array.isArray(editionsRaw.entries) && editionsRaw.entries.length > 0) {
+          const readableEdition = editionsRaw.entries.find(
+            (e) => Boolean(e.ocaid) || Boolean(e.ia) || (Array.isArray(e.ia_loaded_id) && e.ia_loaded_id.length > 0)
+          );
+          topEdition = readableEdition || editionsRaw.entries[0] || null;
+        }
+      } catch {
+        // Non-critical
+      }
+
+      // If topEdition didn't provide an IA scan ID, query the search index for this specific work
+      if (!topEdition?.ocaid && !topEdition?.ia) {
+        try {
+          const workSearch = await fetchFromOpenLibrary<{ docs?: Array<{ ia?: string[] | string }> }>(
+            `/search.json?q=key:/works/${cleanKey}&fields=ia&limit=1`
+          );
+          const firstDoc = workSearch.docs?.[0];
+          if (firstDoc?.ia) {
+            iaFallback = Array.isArray(firstDoc.ia) ? firstDoc.ia[0] : firstDoc.ia;
+          }
+        } catch {
+          // Non-critical
+        }
+      }
+
+      // Resolve author names if present
+      if (Array.isArray(workData.authors) && workData.authors.length > 0) {
+        const authorPromises = workData.authors.slice(0, 3).map(async (a: unknown) => {
+          const authKey = (a as { author?: { key?: string } })?.author?.key;
+          if (!authKey) return null;
+          try {
+            const authorData = await fetchFromOpenLibrary<{ name?: string }>(`${authKey}.json`);
+            return authorData.name || null;
+          } catch {
+            return null;
+          }
+        });
+        const resolved = await Promise.all(authorPromises);
+        authorNames = resolved.filter((name): name is string => typeof name === 'string');
+      }
+    }
+
+    const normalized = normalizeBookDetail(workData, cleanKey, topEdition, authorNames, iaFallback);
+    cacheStore.set(cacheKey, normalized, TTL_BOOK_DETAIL);
+    return c.json(normalized);
+  } catch (err: unknown) {
+    if (err instanceof RateLimitError) {
+      return c.json({ error: err.message, code: 'RATE_LIMITED' }, 429);
+    }
+    if (err instanceof NotFoundError) {
+      return c.json({ error: 'Book not found on Open Library', code: 'NOT_FOUND' }, 404);
+    }
+    if (err instanceof OpenLibraryError) {
+      return c.json({ error: err.message, code: 'OPEN_LIBRARY_ERROR' }, err.status as 400 | 500);
+    }
+    return c.json({ error: 'Failed to retrieve book details', code: 'INTERNAL_ERROR' }, 500);
+  }
+});
+
+// GET /api/cover/:coverId?size=M
+app.get('/api/cover/:coverId', async (c) => {
+  const coverId = c.req.param('coverId');
+  const sizeParam = (c.req.query('size') || 'M').toUpperCase();
+  const size = ['S', 'M', 'L'].includes(sizeParam) ? sizeParam : 'M';
+
+  if (!coverId || isNaN(Number(coverId))) {
+    return c.text('Invalid cover ID', 400);
+  }
+
+  const coverUrl = `https://covers.openlibrary.org/b/id/${coverId}-${size}.jpg?default=false`;
+
+  try {
+    const res = await fetch(coverUrl, {
+      headers: {
+        'User-Agent': process.env.OPEN_LIBRARY_USER_AGENT || 'ShelfVan (contact@example.com)',
+      },
+    });
+
+    if (!res.ok) {
+      return c.text('Cover not found', 404);
+    }
+
+    const contentType = res.headers.get('content-type') || 'image/jpeg';
+    const buffer = await res.arrayBuffer();
+
+    c.header('Content-Type', contentType);
+    c.header('Cache-Control', 'public, max-age=86400, immutable');
+    return c.body(buffer);
+  } catch {
+    return c.text('Failed to load cover image', 502);
+  }
+});
+
