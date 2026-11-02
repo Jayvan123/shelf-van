@@ -17,7 +17,7 @@ const DISCOVER_ROWS = [
   { title: 'Plays & Drama', subject: 'plays', icon: '🎭' },
 ];
 
-export const Search: React.FC = () => {
+export const DiscoverPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [page, setPage] = useState(1);
