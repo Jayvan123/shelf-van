@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
-import { ALL_CATALOG_CATEGORIES } from '../constants/catalogs.ts';
+import { ALL_CATALOG_CATEGORIES, type CatalogGenre } from '../constants/catalogs.ts';
 import { useSubjectBooks } from '../api/hooks.ts';
 import { BookCard } from '../components/BookCard.tsx';
 
@@ -9,77 +8,106 @@ export const AllCatalogsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedGenre = searchParams.get('genre');
   const [page, setPage] = useState(1);
-  const [filterText, setFilterText] = useState('');
+  const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const { data: genreBooks, isLoading: isGenreLoading, isError: isGenreError } = useSubjectBooks(
+  const { data: genreBooks, isLoading: isGenreLoading, isError: isGenreError, isFetching } = useSubjectBooks(
     selectedGenre || undefined,
     page
   );
 
-  const trimmedFilter = filterText.trim().toLowerCase();
+  const trimmedQuery = searchQuery.trim().toLowerCase();
 
-  const filteredCategories = ALL_CATALOG_CATEGORIES.map((cat) => {
-    const matchingGenres = cat.genres.filter(
-      (g) =>
-        g.name.toLowerCase().includes(trimmedFilter) ||
-        (g.description && g.description.toLowerCase().includes(trimmedFilter)) ||
-        g.subject.toLowerCase().includes(trimmedFilter)
-    );
-    return {
-      category: cat.category,
-      genres: matchingGenres,
-    };
-  }).filter((cat) => cat.genres.length > 0);
+  const allGenresFlat: CatalogGenre[] = useMemo(
+    () => ALL_CATALOG_CATEGORIES.flatMap((c) => c.genres),
+    []
+  );
 
-  const totalGenres = ALL_CATALOG_CATEGORIES.reduce((acc, c) => acc + c.genres.length, 0);
+  const displayedGenres = useMemo(() => {
+    let list =
+      activeCategory === 'all'
+        ? allGenresFlat
+        : ALL_CATALOG_CATEGORIES.find((c) => c.category === activeCategory)?.genres || [];
 
-  // If a specific genre is selected, show that catalog's book covers!
+    if (trimmedQuery) {
+      list = list.filter(
+        (g) =>
+          g.name.toLowerCase().includes(trimmedQuery) ||
+          g.subject.toLowerCase().includes(trimmedQuery) ||
+          (g.description && g.description.toLowerCase().includes(trimmedQuery))
+      );
+    }
+
+    return list;
+  }, [activeCategory, allGenresFlat, trimmedQuery]);
+
+  // ---------------------------------------------------------------------------
+  // View A: Selected Genre Books Grid (Simple, matching DiscoverPage search results)
+  // ---------------------------------------------------------------------------
   if (selectedGenre) {
-    const allGenresFlat = ALL_CATALOG_CATEGORIES.flatMap((c) => c.genres);
     const genreMeta = allGenresFlat.find((g) => g.subject === selectedGenre);
     const genreTitle = genreMeta?.name || selectedGenre.replace(/_/g, ' ');
 
     return (
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '24px 20px 60px 20px' }}>
-        <button
-          onClick={() => { setSearchParams({}); setPage(1); }}
+        <div
           style={{
-            background: 'none',
-            border: 'none',
-            display: 'inline-flex',
+            display: 'flex',
+            justifyContent: 'space-between',
             alignItems: 'center',
-            gap: '6px',
-            color: '#666',
-            fontSize: '0.9rem',
-            cursor: 'pointer',
-            padding: 0,
-            marginBottom: '20px',
+            marginBottom: '24px',
+            flexWrap: 'wrap',
+            gap: '12px',
           }}
         >
-          <ArrowLeft size={16} />
-          Back to All Catalogs
-        </button>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
-          {genreMeta?.icon && <span style={{ fontSize: '1.5rem' }}>{genreMeta.icon}</span>}
-          <h2 style={{ fontSize: '1.4rem', fontWeight: '800', margin: 0 }}>
-            {genreTitle}
-          </h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <button
+              onClick={() => {
+                setSearchParams({});
+                setPage(1);
+              }}
+              style={{
+                background: 'none',
+                border: '1px solid #d4d4d8',
+                borderRadius: '6px',
+                padding: '6px 14px',
+                fontSize: '0.88rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                color: '#18181b',
+                backgroundColor: '#ffffff',
+              }}
+            >
+              &larr; All Catalogs
+            </button>
+            <h2 style={{ fontSize: '1.4rem', fontWeight: '800', margin: 0, letterSpacing: '-0.3px' }}>
+              {genreTitle}
+            </h2>
+          </div>
           {genreBooks && (
-            <span style={{ fontSize: '0.85rem', color: '#888', marginLeft: '6px' }}>
-              ({genreBooks.total.toLocaleString()} books)
+            <span style={{ fontSize: '0.9rem', color: '#71717a' }}>
+              {genreBooks.total.toLocaleString()} books found (Page {page})
             </span>
           )}
         </div>
 
         {isGenreError && (
-          <div style={{ padding: '16px', backgroundColor: '#fef2f2', color: '#991b1b', border: '1px solid #fecaca', borderRadius: '6px', marginBottom: '20px' }}>
-            Failed to load books for this catalog.
+          <div
+            style={{
+              padding: '16px',
+              backgroundColor: '#fef2f2',
+              color: '#991b1b',
+              border: '1px solid #fecaca',
+              borderRadius: '6px',
+              marginBottom: '20px',
+            }}
+          >
+            Failed to load books. Please try again.
           </div>
         )}
 
         {isGenreLoading ? (
-          <div style={{ padding: '60px 0', textAlign: 'center', color: '#777' }}>
+          <div style={{ padding: '60px 0', textAlign: 'center', color: '#71717a' }}>
             <p>Loading books in {genreTitle}...</p>
           </div>
         ) : genreBooks && genreBooks.books.length > 0 ? (
@@ -88,7 +116,7 @@ export const AllCatalogsPage: React.FC = () => {
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-                gap: '24px 16px',
+                gap: '28px 18px',
               }}
             >
               {genreBooks.books.map((book) => (
@@ -96,124 +124,231 @@ export const AllCatalogsPage: React.FC = () => {
               ))}
             </div>
 
-            {/* Pagination */}
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', marginTop: '40px' }}>
+            {/* Pagination matching DiscoverPage */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '16px',
+                marginTop: '48px',
+              }}
+            >
               <button
-                disabled={page <= 1}
-                onClick={() => { setPage((p) => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                style={{ padding: '8px 16px', borderRadius: '4px', border: '1px solid #ccc', cursor: page > 1 ? 'pointer' : 'not-allowed' }}
+                disabled={page <= 1 || isFetching}
+                onClick={() => {
+                  setPage((p) => Math.max(1, p - 1));
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                style={{
+                  padding: '8px 18px',
+                  borderRadius: '6px',
+                  border: '1px solid #d4d4d8',
+                  backgroundColor: '#fff',
+                  cursor: page > 1 ? 'pointer' : 'not-allowed',
+                  opacity: page > 1 ? 1 : 0.5,
+                  fontWeight: '600',
+                }}
               >
                 &larr; Previous Page
               </button>
-              <span style={{ fontSize: '0.9rem', color: '#555' }}>Page {page}</span>
+              <span style={{ fontSize: '0.9rem', color: '#52525b', fontWeight: '500' }}>Page {page}</span>
               <button
-                disabled={genreBooks.books.length < 20}
-                onClick={() => { setPage((p) => p + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                style={{ padding: '8px 16px', borderRadius: '4px', border: '1px solid #ccc', cursor: 'pointer' }}
+                disabled={genreBooks.books.length < 20 || isFetching}
+                onClick={() => {
+                  setPage((p) => p + 1);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                style={{
+                  padding: '8px 18px',
+                  borderRadius: '6px',
+                  border: '1px solid #d4d4d8',
+                  backgroundColor: '#fff',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                }}
               >
                 Next Page &rarr;
               </button>
             </div>
           </div>
         ) : (
-          <p>No books found in this catalog.</p>
+          <p style={{ padding: '60px 0', textAlign: 'center', color: '#71717a' }}>
+            No books found in this catalog.
+          </p>
         )}
       </div>
     );
   }
 
-  // Otherwise, show directory of all catalogs
+  // ---------------------------------------------------------------------------
+  // View B: Catalogs Directory (Simple, visually identical style to DiscoverPage)
+  // ---------------------------------------------------------------------------
   return (
     <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '24px 20px 60px 20px' }}>
-      <h2 style={{ fontSize: '1.4rem', fontWeight: '800', marginBottom: '6px' }}>All Catalogs & Book Genres</h2>
-      <p style={{ color: '#666', margin: '0 0 20px 0', fontSize: '0.95rem' }}>
-        Explore Open Library's public catalog across <strong>{totalGenres}</strong> curated genres and categories.
-        Click any genre to view its books.
-      </p>
+      {/* Header */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '20px',
+          flexWrap: 'wrap',
+          gap: '12px',
+        }}
+      >
+        <div>
+          <h2 style={{ fontSize: '1.4rem', fontWeight: '800', margin: 0, letterSpacing: '-0.3px' }}>
+            Book Catalogs
+          </h2>
+          <p style={{ color: '#71717a', margin: '4px 0 0 0', fontSize: '0.9rem' }}>
+            Select a subject to browse open library collections.
+          </p>
+        </div>
 
-      {/* Genre Filter Bar */}
-      <div style={{ marginBottom: '24px' }}>
+        {/* Filter Input */}
         <input
           type="text"
-          placeholder="Filter genres (e.g. fiction, philosophy, space, food)..."
-          value={filterText}
-          onChange={(e) => setFilterText(e.target.value)}
-          style={{ width: '360px', maxWidth: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #ccc' }}
+          placeholder="Filter catalogs..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={{
+            padding: '8px 14px',
+            borderRadius: '6px',
+            border: '1px solid #d4d4d8',
+            fontSize: '0.9rem',
+            width: '240px',
+            outline: 'none',
+          }}
         />
-        {filterText && (
-          <button
-            onClick={() => setFilterText('')}
-            style={{ marginLeft: '8px', padding: '8px 12px', border: '1px solid #ccc', borderRadius: '6px', background: '#f5f5f5', cursor: 'pointer' }}
-          >
-            Clear
-          </button>
-        )}
       </div>
 
-      {filteredCategories.length === 0 ? (
-        <p style={{ color: '#777', margin: '24px 0' }}>
-          No genres matched "{filterText}". Try a different keyword.
+      {/* Category Filter Pills */}
+      <div
+        style={{
+          display: 'flex',
+          gap: '8px',
+          overflowX: 'auto',
+          marginBottom: '28px',
+          paddingBottom: '4px',
+        }}
+        className="hide-scrollbar"
+      >
+        <button
+          onClick={() => setActiveCategory('all')}
+          style={{
+            padding: '6px 14px',
+            borderRadius: '999px',
+            border: activeCategory === 'all' ? '1px solid #18181b' : '1px solid #e4e4e7',
+            backgroundColor: activeCategory === 'all' ? '#18181b' : '#ffffff',
+            color: activeCategory === 'all' ? '#ffffff' : '#52525b',
+            fontSize: '0.84rem',
+            fontWeight: '600',
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          All
+        </button>
+
+        {ALL_CATALOG_CATEGORIES.map((cat) => {
+          const isActive = activeCategory === cat.category;
+          return (
+            <button
+              key={cat.category}
+              onClick={() => setActiveCategory(isActive ? 'all' : cat.category)}
+              style={{
+                padding: '6px 14px',
+                borderRadius: '999px',
+                border: isActive ? '1px solid #18181b' : '1px solid #e4e4e7',
+                backgroundColor: isActive ? '#18181b' : '#ffffff',
+                color: isActive ? '#ffffff' : '#52525b',
+                fontSize: '0.84rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {cat.shortName}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Grid of Catalogs matching DiscoverPage style */}
+      {displayedGenres.length === 0 ? (
+        <p style={{ padding: '60px 0', textAlign: 'center', color: '#71717a' }}>
+          No catalogs found matching "{searchQuery}".
         </p>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
-          {filteredCategories.map((group) => (
-            <div key={group.category} style={{ border: '1px solid #e5e5e5', padding: '16px', borderRadius: '6px' }}>
-              <h3 style={{ margin: '0 0 12px 0', borderBottom: '1px solid #eee', paddingBottom: '8px', fontSize: '1.1rem' }}>
-                {group.category} ({group.genres.length})
-              </h3>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+            gap: '28px 18px',
+          }}
+        >
+          {displayedGenres.map((genre) => {
+            const coverSrc = `https://covers.openlibrary.org/b/id/${genre.coverId}-M.jpg`;
 
+            return (
               <div
+                key={genre.subject}
+                onClick={() => {
+                  setSearchParams({ genre: genre.subject });
+                  setPage(1);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
                 style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-                  gap: '12px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  cursor: 'pointer',
+                  width: '100%',
                 }}
               >
-                {group.genres.map((genre) => (
-                  <div
-                    key={genre.subject}
+                {/* 3D Book Cover */}
+                <div className="book-cover" title={genre.name}>
+                  <img
+                    src={coverSrc}
+                    alt={genre.name}
+                    loading="lazy"
+                    onError={(e) => {
+                      (e.target as HTMLElement).style.display = 'none';
+                    }}
+                  />
+                </div>
+
+                {/* Title & Subtitle */}
+                <div style={{ marginTop: '8px', padding: '0 2px' }}>
+                  <h3
                     style={{
-                      border: '1px solid #e8e8e8',
-                      padding: '12px',
-                      borderRadius: '6px',
-                      backgroundColor: '#fafafa',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',
+                      fontSize: '0.88rem',
+                      fontWeight: '700',
+                      color: '#18181b',
+                      lineHeight: '1.3',
+                      margin: 0,
                     }}
                   >
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                        {genre.icon && <span style={{ fontSize: '1.2rem' }}>{genre.icon}</span>}
-                        <strong style={{ fontSize: '0.95rem' }}>{genre.name}</strong>
-                      </div>
-                      {genre.description && (
-                        <p style={{ fontSize: '0.82rem', color: '#666', margin: '0 0 10px 0' }}>
-                          {genre.description}
-                        </p>
-                      )}
-                    </div>
-
-                    <button
-                      onClick={() => { setSearchParams({ genre: genre.subject }); setPage(1); }}
+                    {genre.name}
+                  </h3>
+                  {genre.description && (
+                    <p
                       style={{
-                        width: '100%',
-                        fontSize: '0.85rem',
-                        padding: '6px 10px',
-                        borderRadius: '4px',
-                        border: '1px solid #ddd',
-                        backgroundColor: '#fff',
-                        cursor: 'pointer',
-                        fontWeight: '600',
+                        fontSize: '0.78rem',
+                        color: '#71717a',
+                        marginTop: '2px',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
                       }}
                     >
-                      Browse {genre.name} &rarr;
-                    </button>
-                  </div>
-                ))}
+                      {genre.description}
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
