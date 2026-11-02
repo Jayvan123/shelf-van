@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Search as SearchIcon, X } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { useBookSearch } from '../api/hooks.ts';
 import { BookCard } from '../components/BookCard.tsx';
 import { BookRow } from '../components/BookRow.tsx';
+import { FeaturedBanner } from '../components/FeaturedBanner.tsx';
 
 // Predefined rows for the Discover screen
 const DISCOVER_ROWS = [
@@ -18,82 +19,33 @@ const DISCOVER_ROWS = [
 ];
 
 export const DiscoverPage: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [searchParams] = useSearchParams();
+  const queryParam = searchParams.get('q') || '';
   const [page, setPage] = useState(1);
 
-  // 300ms debounce for search query
+  // Reset page to 1 when query changes
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedQuery(searchTerm);
-      setPage(1);
-    }, 300);
-
-    return () => clearTimeout(handler);
-  }, [searchTerm]);
+    setPage(1);
+  }, [queryParam]);
 
   const { data: searchData, isLoading: isSearchLoading, isError: isSearchError, error: searchError, isFetching } = useBookSearch(
-    debouncedQuery,
+    queryParam,
     page
   );
 
-  const isSearching = Boolean(debouncedQuery.trim());
+  const isSearching = Boolean(queryParam.trim());
 
   return (
     <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '24px 20px 60px 20px' }}>
-      {/* Search Input Bar */}
-      <div style={{ marginBottom: '28px' }}>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            backgroundColor: '#f8f8f8',
-            borderRadius: '8px',
-            padding: '10px 16px',
-            border: '1px solid #ddd',
-            maxWidth: '600px',
-          }}
-        >
-          <SearchIcon size={18} color="#777" style={{ marginRight: '10px' }} />
-          <input
-            type="text"
-            placeholder="Search by book title, author, or keyword..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              outline: 'none',
-              fontSize: '1rem',
-              width: '100%',
-              color: '#1a1a1a',
-            }}
-          />
-          {searchTerm && (
-            <button
-              onClick={() => { setSearchTerm(''); setDebouncedQuery(''); }}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px 6px' }}
-            >
-              <X size={16} color="#777" />
-            </button>
-          )}
-        </div>
-        {isFetching && isSearching && (
-          <span style={{ fontSize: '0.85rem', color: '#888', marginTop: '6px', display: 'inline-block' }}>
-            Searching Open Library...
-          </span>
-        )}
-      </div>
-
-      {/* Mode A: Live Search Results Grid (when user typed a query) */}
+      {/* Mode A: Live Search Results Grid (when user searched from the header) */}
       {isSearching ? (
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h2 style={{ fontSize: '1.3rem', fontWeight: '700', margin: 0 }}>
-              Search Results for "{debouncedQuery}"
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <h2 style={{ fontSize: '1.4rem', fontWeight: '800', margin: 0, letterSpacing: '-0.3px' }}>
+              Search Results for "{queryParam}"
             </h2>
             {searchData && (
-              <span style={{ fontSize: '0.9rem', color: '#666' }}>
+              <span style={{ fontSize: '0.9rem', color: '#71717a' }}>
                 {searchData.total.toLocaleString()} books found (Page {searchData.page})
               </span>
             )}
@@ -106,16 +58,16 @@ export const DiscoverPage: React.FC = () => {
           )}
 
           {isSearchLoading ? (
-            <div style={{ padding: '40px 0', textAlign: 'center', color: '#777' }}>
-              <p>Fetching search results...</p>
+            <div style={{ padding: '60px 0', textAlign: 'center', color: '#71717a' }}>
+              <p>Fetching search results from Open Library...</p>
             </div>
           ) : searchData && searchData.books.length > 0 ? (
             <div>
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))',
-                  gap: '24px 16px',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+                  gap: '28px 18px',
                 }}
               >
                 {searchData.books.map((book) => (
@@ -124,33 +76,52 @@ export const DiscoverPage: React.FC = () => {
               </div>
 
               {/* Pagination */}
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', marginTop: '40px' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', marginTop: '48px' }}>
                 <button
                   disabled={page <= 1 || isFetching}
                   onClick={() => { setPage((p) => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  style={{ padding: '8px 16px', borderRadius: '4px', border: '1px solid #ccc', cursor: page > 1 ? 'pointer' : 'not-allowed' }}
+                  style={{
+                    padding: '8px 18px',
+                    borderRadius: '6px',
+                    border: '1px solid #d4d4d8',
+                    backgroundColor: '#fff',
+                    cursor: page > 1 ? 'pointer' : 'not-allowed',
+                    opacity: page > 1 ? 1 : 0.5,
+                    fontWeight: '600',
+                  }}
                 >
                   &larr; Previous Page
                 </button>
-                <span style={{ fontSize: '0.9rem', color: '#555' }}>Page {page}</span>
+                <span style={{ fontSize: '0.9rem', color: '#52525b', fontWeight: '500' }}>Page {page}</span>
                 <button
                   disabled={searchData.books.length < 20 || isFetching}
                   onClick={() => { setPage((p) => p + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  style={{ padding: '8px 16px', borderRadius: '4px', border: '1px solid #ccc', cursor: 'pointer' }}
+                  style={{
+                    padding: '8px 18px',
+                    borderRadius: '6px',
+                    border: '1px solid #d4d4d8',
+                    backgroundColor: '#fff',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                  }}
                 >
                   Next Page &rarr;
                 </button>
               </div>
             </div>
           ) : (
-            <p style={{ padding: '40px 0', textAlign: 'center', color: '#666' }}>
-              No books found matching "{debouncedQuery}". Try a different search term.
+            <p style={{ padding: '60px 0', textAlign: 'center', color: '#71717a' }}>
+              No books found matching "{queryParam}". Try a different keyword or author.
             </p>
           )}
         </div>
       ) : (
-        /* Mode B: Horizontal Scrollable Category Rows (stacked under Books / Discover) */
+        /* Mode B: Main Discover Screen */
         <div>
+          {/* Big Featured Hero Banner matching the uploaded image */}
+          <FeaturedBanner />
+
+          {/* Horizontally Scrollable Category Rows */}
           {DISCOVER_ROWS.map((row) => (
             <BookRow
               key={row.subject}
