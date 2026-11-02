@@ -62,7 +62,7 @@ export const FeaturedBanner: React.FC = () => {
       {/* Left Text Content */}
       <div style={{ flex: '1 1 340px', zIndex: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-          <Sparkles size={16} color="#d4d4d8" />
+          
           <span
             style={{
               fontSize: '0.82rem',
