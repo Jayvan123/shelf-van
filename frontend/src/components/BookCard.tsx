@@ -38,54 +38,62 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd }) => {
       }}
     >
       {/* 3D Book Cover */}
-      <Link
-        to={`/book/${book.key}`}
-        className="book-cover"
-        title={book.title}
-      >
-        {coverSrc ? (
-          <img
-            src={coverSrc}
-            alt={book.title}
-            loading="lazy"
-            onError={(e) => {
-              (e.target as HTMLElement).style.display = 'none';
-            }}
-          />
-        ) : (
-          <div
-            style={{
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '16px',
-              textAlign: 'center',
-              backgroundColor: '#f4f4f5',
-              color: '#52525b',
-            }}
-          >
-            <Book size={32} style={{ marginBottom: '8px', opacity: 0.5 }} />
-            <span
+      <div className="book-cover">
+        <Link
+          to={`/book/${book.key}`}
+          title={book.title}
+          style={{
+            display: 'block',
+            width: '100%',
+            height: '100%',
+            textDecoration: 'none',
+            color: 'inherit',
+          }}
+        >
+          {coverSrc ? (
+            <img
+              src={coverSrc}
+              alt={book.title}
+              loading="lazy"
+              onError={(e) => {
+                (e.target as HTMLElement).style.display = 'none';
+              }}
+            />
+          ) : (
+            <div
               style={{
-                fontSize: '0.82rem',
-                fontWeight: 'bold',
-                lineHeight: '1.25',
-                display: '-webkit-box',
-                WebkitLineClamp: 3,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '16px',
+                textAlign: 'center',
+                backgroundColor: '#f4f4f5',
+                color: '#52525b',
               }}
             >
-              {book.title}
-            </span>
-            <span style={{ fontSize: '0.7rem', color: '#71717a', marginTop: '6px' }}>
-              {book.authors[0] || 'Open Library'}
-            </span>
-          </div>
-        )}
+              <Book size={32} style={{ marginBottom: '8px', opacity: 0.5 }} />
+              <span
+                style={{
+                  fontSize: '0.82rem',
+                  fontWeight: 'bold',
+                  lineHeight: '1.25',
+                  display: '-webkit-box',
+                  WebkitLineClamp: 3,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                }}
+              >
+                {book.title}
+              </span>
+              <span style={{ fontSize: '0.7rem', color: '#71717a', marginTop: '6px' }}>
+                {book.authors[0] || 'Open Library'}
+              </span>
+            </div>
+          )}
+        </Link>
 
         {/* Hover Quick Action Overlay */}
         <div
@@ -120,6 +128,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd }) => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '4px',
+                textDecoration: 'none',
               }}
             >
               <Eye size={13} />
@@ -128,6 +137,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd }) => {
           )}
 
           <button
+            type="button"
             onClick={(e) => handleAdd(e, 'want_to_read')}
             style={{
               flex: book.isReadable ? undefined : 1,
@@ -151,7 +161,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd }) => {
             {shelfEntry ? 'Saved' : 'Save'}
           </button>
         </div>
-      </Link>
+      </div>
 
       {/* Meta Row Directly Under Cover */}
       <div

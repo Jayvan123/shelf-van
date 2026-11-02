@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Sparkles, BookOpen } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 import { useSubjectBooks } from '../api/hooks.ts';
 
 const CURATED_FEATURED = [
