@@ -1,32 +1,48 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Bookmark, Library, Compass } from 'lucide-react';
+import { Compass, Library, Bookmark } from 'lucide-react';
 import { useShelfStore } from '../store/useShelfStore.ts';
 
 export const Navbar: React.FC = () => {
   const books = useShelfStore((state) => state.books);
   const location = useLocation();
 
-  const isShelf = location.pathname === '/';
-  const isSearch = location.pathname === '/search';
+  const isDiscover = location.pathname === '/' || location.pathname === '/search';
   const isCatalogs = location.pathname === '/catalogs';
+  const isShelf = location.pathname === '/shelf';
+
+  const linkStyle = (active: boolean) => ({
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 16px',
+    borderRadius: '6px',
+    fontSize: '0.95rem',
+    fontWeight: active ? '700' : '500',
+    color: active ? '#ff5436' : '#333',
+    backgroundColor: active ? '#fff3f0' : 'transparent',
+    textDecoration: 'none',
+    border: active ? '1px solid #ffdcd6' : '1px solid transparent',
+    cursor: 'pointer',
+    transition: 'all 0.15s ease',
+  });
 
   return (
-    <header style={{ backgroundColor: '#fff', borderBottom: '1px solid #f0f0f0', position: 'sticky', top: 0, zIndex: 40 }}>
-      {/* Top Brand Bar */}
+    <header style={{ backgroundColor: '#fff', borderBottom: '1px solid #e5e5e5', position: 'sticky', top: 0, zIndex: 40 }}>
       <div
         style={{
           maxWidth: '1280px',
           margin: '0 auto',
-          padding: '14px 24px',
+          padding: '12px 20px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           gap: '16px',
+          flexWrap: 'wrap',
         }}
       >
-        {/* Logo */}
-        <Link to="/search" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
+        {/* Brand Logo */}
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
           <div
             style={{
               backgroundColor: '#ff5436',
@@ -43,64 +59,25 @@ export const Navbar: React.FC = () => {
           >
             🚐
           </div>
-          <span style={{ fontSize: '1.35rem', fontWeight: '800', letterSpacing: '-0.5px', color: '#1a1a1a' }}>
+          <span style={{ fontSize: '1.3rem', fontWeight: '800', letterSpacing: '-0.5px', color: '#1a1a1a' }}>
             ShelfVan
           </span>
         </Link>
 
-        {/* Quick Nav Links */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <Link
-            to="/search"
-            style={{
-              fontSize: '0.92rem',
-              fontWeight: isSearch ? '700' : '500',
-              color: isSearch ? '#ff5436' : '#555',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              textDecoration: 'none',
-              padding: '6px 8px',
-            }}
-          >
+        {/* Header Screens / Navigation Buttons */}
+        <nav style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          <Link to="/" style={linkStyle(isDiscover)}>
             <Compass size={17} />
-            Discover
+            Books / Discover
           </Link>
 
-          <Link
-            to="/catalogs"
-            style={{
-              fontSize: '0.92rem',
-              fontWeight: isCatalogs ? '700' : '500',
-              color: isCatalogs ? '#ff5436' : '#555',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              textDecoration: 'none',
-              padding: '6px 8px',
-            }}
-          >
+          <Link to="/catalogs" style={linkStyle(isCatalogs)}>
             <Library size={17} />
             All Catalogs
           </Link>
 
-          <Link
-            to="/"
-            style={{
-              fontSize: '0.92rem',
-              fontWeight: isShelf ? '700' : '500',
-              color: isShelf ? '#ff5436' : '#1a1a1a',
-              backgroundColor: isShelf ? '#fff3f0' : '#f5f5f5',
-              padding: '6px 14px',
-              borderRadius: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              textDecoration: 'none',
-              transition: 'background-color 0.2s',
-            }}
-          >
-            <Bookmark size={15} color={isShelf ? '#ff5436' : '#555'} />
+          <Link to="/shelf" style={linkStyle(isShelf)}>
+            <Bookmark size={17} />
             My Shelf
             {books.length > 0 && (
               <span
@@ -111,6 +88,7 @@ export const Navbar: React.FC = () => {
                   fontWeight: 'bold',
                   padding: '1px 6px',
                   borderRadius: '10px',
+                  marginLeft: '4px',
                 }}
               >
                 {books.length}
