@@ -26,9 +26,10 @@ const AppLayout: React.FC = () => {
       {!isReaderPage && <Navbar />}
       <main>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/catalogs" element={<Catalogs />} />
+          <Route path="/" element={<Search />} />
           <Route path="/search" element={<Search />} />
+          <Route path="/catalogs" element={<Catalogs />} />
+          <Route path="/shelf" element={<Home />} />
           <Route path="/book/:key" element={<BookDetail />} />
           <Route path="/read/:key" element={<Reader />} />
         </Routes>
