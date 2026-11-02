@@ -132,8 +132,8 @@ export const BookDetailPage: React.FC = () => {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
-                  backgroundColor: '#fff3f0',
-                  color: '#ff5436',
+                  backgroundColor: '#f4f4f5',
+                  color: '#18181b',
                   fontSize: '0.82rem',
                   fontWeight: '700',
                   padding: '4px 10px',
@@ -150,8 +150,8 @@ export const BookDetailPage: React.FC = () => {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
-                  backgroundColor: '#f5f5f5',
-                  color: '#777',
+                  backgroundColor: '#f4f4f5',
+                  color: '#71717a',
                   fontSize: '0.82rem',
                   padding: '4px 10px',
                   borderRadius: '16px',
@@ -170,9 +170,9 @@ export const BookDetailPage: React.FC = () => {
                 alignItems: 'center',
                 flexWrap: 'wrap',
                 padding: '16px',
-                backgroundColor: '#f9f9f9',
+                backgroundColor: '#fafafa',
                 borderRadius: '8px',
-                border: '1px solid #ededed',
+                border: '1px solid #e4e4e7',
                 marginBottom: '28px',
               }}
             >
@@ -180,7 +180,7 @@ export const BookDetailPage: React.FC = () => {
                 <Link to={`/read/${book.key}`}>
                   <button
                     style={{
-                      backgroundColor: '#ff5436',
+                      backgroundColor: '#18181b',
                       color: '#fff',
                       border: 'none',
                       fontWeight: '700',
@@ -191,7 +191,7 @@ export const BookDetailPage: React.FC = () => {
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '8px',
-                      boxShadow: '0 2px 6px rgba(255, 84, 54, 0.3)',
+                      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
                     }}
                   >
                     <BookOpen size={17} />

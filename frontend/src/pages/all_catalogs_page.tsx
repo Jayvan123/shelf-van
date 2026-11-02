@@ -73,7 +73,7 @@ export const AllCatalogsPage: React.FC = () => {
         </div>
 
         {isGenreError && (
-          <div style={{ padding: '16px', backgroundColor: '#fff3f0', color: '#d32f2f', borderRadius: '6px', marginBottom: '20px' }}>
+          <div style={{ padding: '16px', backgroundColor: '#fef2f2', color: '#991b1b', border: '1px solid #fecaca', borderRadius: '6px', marginBottom: '20px' }}>
             Failed to load books for this catalog.
           </div>
         )}

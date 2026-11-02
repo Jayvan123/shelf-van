@@ -6,15 +6,15 @@ import { BookRow } from '../components/BookRow.tsx';
 
 // Predefined rows for the Discover screen
 const DISCOVER_ROWS = [
-  { title: 'Classic Literature', subject: 'classic_literature', icon: '📜' },
-  { title: 'Science Fiction', subject: 'science_fiction', icon: '🚀' },
-  { title: 'Fantasy', subject: 'fantasy', icon: '🧙' },
-  { title: 'Mystery & Detective', subject: 'mystery_and_detective_stories', icon: '🕵️' },
-  { title: 'History & Biography', subject: 'history', icon: '🏛️' },
-  { title: 'Philosophy & Thought', subject: 'philosophy', icon: '🧠' },
-  { title: 'Romance', subject: 'romance', icon: '💖' },
-  { title: 'Children & Young Readers', subject: 'children', icon: '🧸' },
-  { title: 'Plays & Drama', subject: 'plays', icon: '🎭' },
+  { title: 'Classic Literature', subject: 'classic_literature' },
+  { title: 'Science Fiction', subject: 'science_fiction' },
+  { title: 'Fantasy', subject: 'fantasy' },
+  { title: 'Mystery & Detective', subject: 'mystery_and_detective_stories' },
+  { title: 'History & Biography', subject: 'history' },
+  { title: 'Philosophy & Thought', subject: 'philosophy' },
+  { title: 'Romance', subject: 'romance' },
+  { title: 'Children & Young Readers', subject: 'children' },
+  { title: 'Plays & Drama', subject: 'plays' },
 ];
 
 export const DiscoverPage: React.FC = () => {
@@ -100,7 +100,7 @@ export const DiscoverPage: React.FC = () => {
           </div>
 
           {isSearchError && (
-            <div style={{ padding: '16px', backgroundColor: '#fff3f0', color: '#d32f2f', border: '1px solid #ffccba', borderRadius: '6px', marginBottom: '20px' }}>
+            <div style={{ padding: '16px', backgroundColor: '#fef2f2', color: '#991b1b', border: '1px solid #fecaca', borderRadius: '6px', marginBottom: '20px' }}>
               Notice: {searchError instanceof Error ? searchError.message : 'Search failed. Please try again.'}
             </div>
           )}
@@ -156,7 +156,6 @@ export const DiscoverPage: React.FC = () => {
               key={row.subject}
               title={row.title}
               subject={row.subject}
-              icon={row.icon}
             />
           ))}
         </div>
