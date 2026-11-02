@@ -63,11 +63,11 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd }) => {
               justifyContent: 'center',
               padding: '16px',
               textAlign: 'center',
-              backgroundColor: '#eae8e3',
-              color: '#444',
+              backgroundColor: '#f4f4f5',
+              color: '#52525b',
             }}
           >
-            <Book size={32} style={{ marginBottom: '8px', opacity: 0.6 }} />
+            <Book size={32} style={{ marginBottom: '8px', opacity: 0.5 }} />
             <span
               style={{
                 fontSize: '0.82rem',
@@ -81,7 +81,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd }) => {
             >
               {book.title}
             </span>
-            <span style={{ fontSize: '0.7rem', color: '#777', marginTop: '6px' }}>
+            <span style={{ fontSize: '0.7rem', color: '#71717a', marginTop: '6px' }}>
               {book.authors[0] || 'Open Library'}
             </span>
           </div>
@@ -108,7 +108,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd }) => {
               onClick={(e) => e.stopPropagation()}
               style={{
                 flex: 1,
-                backgroundColor: 'rgba(26, 26, 26, 0.9)',
+                backgroundColor: 'rgba(24, 24, 27, 0.92)',
                 color: '#fff',
                 fontSize: '0.75rem',
                 fontWeight: '600',
@@ -131,7 +131,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd }) => {
             onClick={(e) => handleAdd(e, 'want_to_read')}
             style={{
               flex: book.isReadable ? undefined : 1,
-              backgroundColor: shelfEntry ? '#2e7d32' : 'rgba(255, 84, 54, 0.95)',
+              backgroundColor: shelfEntry ? '#27272a' : '#18181b',
               color: '#fff',
               border: 'none',
               fontSize: '0.75rem',
@@ -142,6 +142,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd }) => {
               alignItems: 'center',
               justifyContent: 'center',
               gap: '4px',
+              cursor: 'pointer',
               boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
             }}
             title={shelfEntry ? 'In your shelf' : 'Add to shelf'}
@@ -152,7 +153,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd }) => {
         </div>
       </Link>
 
-      {/* Meta Row Directly Under Cover matching reference image */}
+      {/* Meta Row Directly Under Cover */}
       <div
         style={{
           display: 'flex',
@@ -162,24 +163,24 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd }) => {
           padding: '0 2px',
         }}
       >
-        {/* Format Icons (Hardcover / E-Book) */}
-        <div style={{ display: 'flex', gap: '6px', color: '#9e9e9e', alignItems: 'center' }}>
+        {/* Format Icons */}
+        <div style={{ display: 'flex', gap: '6px', color: '#a1a1aa', alignItems: 'center' }}>
           <span title="Book edition available" style={{ display: 'inline-flex' }}>
             <Book size={14} />
           </span>
           {book.isReadable && (
-            <span title="Digital scan readable online" style={{ display: 'inline-flex' }}>
-              <Tablet size={14} color="#ff5436" />
+            <span title="Digital scan readable online" style={{ display: 'inline-flex', color: '#18181b' }}>
+              <Tablet size={14} />
             </span>
           )}
         </div>
 
-        {/* Coral Price/Tag matching reference UI ($18 or Free / Year) */}
+        {/* Tag (Monochrome Gray/Black) */}
         <div
           style={{
-            color: '#ff5436',
-            fontSize: '0.85rem',
-            fontWeight: 'bold',
+            color: '#18181b',
+            fontSize: '0.82rem',
+            fontWeight: '700',
             letterSpacing: '-0.2px',
           }}
         >
@@ -194,7 +195,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd }) => {
           style={{
             fontSize: '0.88rem',
             fontWeight: '600',
-            color: '#1a1a1a',
+            color: '#18181b',
             lineHeight: '1.3',
             display: '-webkit-box',
             WebkitLineClamp: 2,
@@ -208,7 +209,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd }) => {
         <p
           style={{
             fontSize: '0.78rem',
-            color: '#8a8a8a',
+            color: '#71717a',
             marginTop: '2px',
             whiteSpace: 'nowrap',
             overflow: 'hidden',

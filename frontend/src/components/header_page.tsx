@@ -19,16 +19,16 @@ export const HeaderPage: React.FC = () => {
     borderRadius: '6px',
     fontSize: '0.95rem',
     fontWeight: active ? '700' : '500',
-    color: active ? '#ff5436' : '#333',
-    backgroundColor: active ? '#fff3f0' : 'transparent',
+    color: active ? '#18181b' : '#52525b',
+    backgroundColor: active ? '#f4f4f5' : 'transparent',
     textDecoration: 'none',
-    border: active ? '1px solid #ffdcd6' : '1px solid transparent',
+    border: active ? '1px solid #e4e4e7' : '1px solid transparent',
     cursor: 'pointer',
     transition: 'all 0.15s ease',
   });
 
   return (
-    <header style={{ backgroundColor: '#fff', borderBottom: '1px solid #e5e5e5', position: 'sticky', top: 0, zIndex: 40 }}>
+    <header style={{ backgroundColor: '#fff', borderBottom: '1px solid #e4e4e7', position: 'sticky', top: 0, zIndex: 40 }}>
       <div
         style={{
           maxWidth: '1280px',
@@ -44,7 +44,7 @@ export const HeaderPage: React.FC = () => {
         {/* Brand Logo */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
           
-          <span style={{ fontSize: '1.3rem', fontWeight: '800', letterSpacing: '-0.5px', color: '#1a1a1a' }}>
+          <span style={{ fontSize: '1.3rem', fontWeight: '800', letterSpacing: '-0.5px', color: '#18181b' }}>
             ShelfVan
           </span>
         </Link>
@@ -67,7 +67,7 @@ export const HeaderPage: React.FC = () => {
             {books.length > 0 && (
               <span
                 style={{
-                  backgroundColor: '#ff5436',
+                  backgroundColor: '#18181b',
                   color: '#fff',
                   fontSize: '0.72rem',
                   fontWeight: 'bold',
