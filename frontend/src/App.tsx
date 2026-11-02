@@ -1,12 +1,12 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Navbar } from './components/Navbar.tsx';
-import { Home } from './pages/Home.tsx';
-import { Search } from './pages/Search.tsx';
-import { Catalogs } from './pages/Catalogs.tsx';
-import { BookDetail } from './pages/BookDetail.tsx';
-import { Reader } from './pages/Reader.tsx';
+import { HeaderPage } from './components/header_page.tsx';
+import { DiscoverPage } from './pages/discover_page.tsx';
+import { AllCatalogsPage } from './pages/all_catalogs_page.tsx';
+import { MyShelfPage } from './pages/my_shelf_page.tsx';
+import { BookDetailPage } from './pages/book_detail_page.tsx';
+import { ReaderPage } from './pages/reader_page.tsx';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,15 +23,15 @@ const AppLayout: React.FC = () => {
 
   return (
     <div>
-      {!isReaderPage && <Navbar />}
+      {!isReaderPage && <HeaderPage />}
       <main>
         <Routes>
-          <Route path="/" element={<Search />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/catalogs" element={<Catalogs />} />
-          <Route path="/shelf" element={<Home />} />
-          <Route path="/book/:key" element={<BookDetail />} />
-          <Route path="/read/:key" element={<Reader />} />
+          <Route path="/" element={<DiscoverPage />} />
+          <Route path="/search" element={<DiscoverPage />} />
+          <Route path="/catalogs" element={<AllCatalogsPage />} />
+          <Route path="/shelf" element={<MyShelfPage />} />
+          <Route path="/book/:key" element={<BookDetailPage />} />
+          <Route path="/read/:key" element={<ReaderPage />} />
         </Routes>
       </main>
     </div>

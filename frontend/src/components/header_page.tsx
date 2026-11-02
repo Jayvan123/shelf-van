@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Compass, Library, Bookmark } from 'lucide-react';
 import { useShelfStore } from '../store/useShelfStore.ts';
 
-export const Navbar: React.FC = () => {
+export const HeaderPage: React.FC = () => {
   const books = useShelfStore((state) => state.books);
   const location = useLocation();
 
@@ -43,22 +43,7 @@ export const Navbar: React.FC = () => {
       >
         {/* Brand Logo */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
-          <div
-            style={{
-              backgroundColor: '#ff5436',
-              color: '#fff',
-              width: '32px',
-              height: '32px',
-              borderRadius: '6px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 'bold',
-              fontSize: '1.1rem',
-            }}
-          >
-            🚐
-          </div>
+          
           <span style={{ fontSize: '1.3rem', fontWeight: '800', letterSpacing: '-0.5px', color: '#1a1a1a' }}>
             ShelfVan
           </span>
