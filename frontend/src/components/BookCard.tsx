@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Book, Tablet, Bookmark, Check, Eye } from 'lucide-react';
+import { Book, Bookmark, Check, Eye } from 'lucide-react';
 import type { BookSummary, ReadingStatus } from '../types/index.ts';
 import { useShelfStore } from '../store/useShelfStore.ts';
 
 interface BookCardProps {
   book: BookSummary;
   onQuickAdd?: (book: BookSummary, status: ReadingStatus) => void;
+  footer?: React.ReactNode;
 }
 
-export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd }) => {
+export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd, footer }) => {
   const { getBook, addOrUpdateBook } = useShelfStore();
   const shelfEntry = getBook(book.key);
   const [isHovered, setIsHovered] = useState(false);
@@ -163,43 +164,8 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd }) => {
         </div>
       </div>
 
-      {/* Meta Row Directly Under Cover */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginTop: '8px',
-          padding: '0 2px',
-        }}
-      >
-        {/* Format Icons */}
-        <div style={{ display: 'flex', gap: '6px', color: '#a1a1aa', alignItems: 'center' }}>
-          <span title="Book edition available" style={{ display: 'inline-flex' }}>
-            <Book size={14} />
-          </span>
-          {book.isReadable && (
-            <span title="Digital scan readable online" style={{ display: 'inline-flex', color: '#18181b' }}>
-              <Tablet size={14} />
-            </span>
-          )}
-        </div>
-
-        {/* Tag (Monochrome Gray/Black) */}
-        <div
-          style={{
-            color: '#18181b',
-            fontSize: '0.82rem',
-            fontWeight: '700',
-            letterSpacing: '-0.2px',
-          }}
-        >
-          {book.isReadable ? 'FREE' : book.firstPublishYear ? `'${String(book.firstPublishYear).slice(-2)}` : 'OL'}
-        </div>
-      </div>
-
       {/* Title & Author */}
-      <div style={{ marginTop: '4px', padding: '0 2px' }}>
+      <div style={{ marginTop: '8px', padding: '0 2px' }}>
         <Link
           to={`/book/${book.key}`}
           style={{
@@ -228,6 +194,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd }) => {
         >
           {book.authors.length > 0 ? book.authors.join(', ') : 'Unknown Author'}
         </p>
+        {footer}
       </div>
     </div>
   );
