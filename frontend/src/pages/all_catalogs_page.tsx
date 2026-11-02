@@ -5,7 +5,7 @@ import { ALL_CATALOG_CATEGORIES } from '../constants/catalogs.ts';
 import { useSubjectBooks } from '../api/hooks.ts';
 import { BookCard } from '../components/BookCard.tsx';
 
-export const Catalogs: React.FC = () => {
+export const AllCatalogsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedGenre = searchParams.get('genre');
   const [page, setPage] = useState(1);

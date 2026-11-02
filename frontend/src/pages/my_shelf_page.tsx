@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useShelfStore } from '../store/useShelfStore.ts';
 import type { ReadingStatus } from '../types/index.ts';
 
-export const Home: React.FC = () => {
+export const MyShelfPage: React.FC = () => {
   const { books, removeBook, updateStatus } = useShelfStore();
   const [filter, setFilter] = useState<ReadingStatus | 'all'>('all');
 
