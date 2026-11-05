@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Trash2, LayoutGrid, Library, Eye, BookOpen } from 'lucide-react';
+import { Trash2, LayoutGrid, Library, Eye, BookOpen, ChevronDown } from 'lucide-react';
 import { useShelfStore } from '../store/useShelfStore.ts';
 import { BookCard } from '../components/BookCard.tsx';
 import type { ReadingStatus, ShelfBook } from '../types/index.ts';
@@ -574,58 +574,77 @@ export const MyShelfPage: React.FC = () => {
                   footer={
                     <div
                       style={{
-                        marginTop: '8px',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '6px',
+                        width: '100%',
                       }}
                     >
-                      <select
-                        value={book.status}
-                        onChange={(e) => updateStatus(book.key, e.target.value as ReadingStatus)}
-                        style={{
-                          flex: 1,
-                          fontSize: '0.74rem',
-                          fontWeight: '600',
-                          color: '#18181b',
-                          backgroundColor: '#f4f4f5',
-                          border: '1px solid #e4e4e7',
-                          borderRadius: '4px',
-                          padding: '5px 6px',
-                          cursor: 'pointer',
-                          outline: 'none',
-                        }}
-                      >
-                        <option value="want_to_read">Want to Read</option>
-                        <option value="reading">Reading</option>
-                        <option value="completed">Completed</option>
-                      </select>
+                      <div style={{ position: 'relative', flex: 1 }}>
+                        <select
+                          value={book.status}
+                          onChange={(e) => updateStatus(book.key, e.target.value as ReadingStatus)}
+                          style={{
+                            width: '100%',
+                            appearance: 'none',
+                            WebkitAppearance: 'none',
+                            backgroundColor: '#f4f4f5',
+                            color: '#18181b',
+                            fontSize: '0.76rem',
+                            fontWeight: '600',
+                            padding: '6px 24px 6px 10px',
+                            borderRadius: '6px',
+                            border: '1px solid #e4e4e7',
+                            cursor: 'pointer',
+                            outline: 'none',
+                            transition: 'all 0.15s ease',
+                          }}
+                          onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#d4d4d8')}
+                          onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#e4e4e7')}
+                        >
+                          <option value="want_to_read">Want to Read</option>
+                          <option value="reading">Reading</option>
+                          <option value="completed">Completed</option>
+                        </select>
+                        <ChevronDown
+                          size={13}
+                          style={{
+                            position: 'absolute',
+                            right: '8px',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            color: '#71717a',
+                            pointerEvents: 'none',
+                          }}
+                        />
+                      </div>
 
                       <button
                         onClick={() => removeBook(book.key)}
                         style={{
                           background: 'none',
-                          border: '1px solid #e4e4e7',
-                          borderRadius: '4px',
-                          color: '#71717a',
+                          border: 'none',
+                          borderRadius: '6px',
+                          color: '#a1a1aa',
                           cursor: 'pointer',
-                          padding: '5px 7px',
+                          padding: '6px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           transition: 'all 0.15s ease',
+                          flexShrink: 0,
                         }}
                         title="Remove from shelf"
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.borderColor = '#fca5a5';
+                          e.currentTarget.style.backgroundColor = '#fef2f2';
                           e.currentTarget.style.color = '#ef4444';
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.borderColor = '#e4e4e7';
-                          e.currentTarget.style.color = '#71717a';
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.color = '#a1a1aa';
                         }}
                       >
-                        <Trash2 size={13} />
+                        <Trash2 size={14} />
                       </button>
                     </div>
                   }
