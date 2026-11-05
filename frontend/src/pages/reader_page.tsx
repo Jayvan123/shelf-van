@@ -9,7 +9,7 @@ export const ReaderPage: React.FC = () => {
   if (isLoading) {
     return (
       <div style={{ padding: '24px 16px' }}>
-        <p>Loading reading scan from Internet Archive via ShelfVan...</p>
+        <p>Loading reading preview via ShelfVan...</p>
       </div>
     );
   }
@@ -77,9 +77,11 @@ export const ReaderPage: React.FC = () => {
               margin: '0 auto',
             }}
           >
-            <h3>Digital Scan Not Available</h3>
+            <h3>Digital Scan / Preview Not Available</h3>
             <p style={{ color: '#aaa', lineHeight: '1.6' }}>
-              Internet Archive does not have an open public-domain scan for this specific title (many modern copyrighted books are restricted to physical libraries or 1-hour waitlist borrowing).
+              {book.provider === 'googlebooks'
+                ? 'A full digital preview is not provided by the publisher for this title.'
+                : 'Internet Archive does not have an open public-domain scan for this specific title (many modern copyrighted books are restricted to physical library lending).'}
             </p>
             {book.previewUrl && (
               <p style={{ margin: '16px 0' }}>
@@ -89,7 +91,9 @@ export const ReaderPage: React.FC = () => {
                   rel="noopener noreferrer"
                   style={{ color: '#64b5f6', textDecoration: 'underline' }}
                 >
-                  Check lending status on Open Library &rarr;
+                  {book.provider === 'googlebooks'
+                    ? 'Check book details on Google Books &rarr;'
+                    : 'Check lending status on Open Library &rarr;'}
                 </a>
               </p>
             )}

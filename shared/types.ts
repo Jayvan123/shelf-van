@@ -1,5 +1,5 @@
 export interface BookSummary {
-  key: string;              // Open Library ID, e.g., "OL45804W" or "OL12345M"
+  key: string;              // Open Library ID, e.g., "OL45804W" or Google Books ID, e.g. "gb_s1gVAAAAYAAJ"
   title: string;
   authors: string[];
   firstPublishYear?: number;
@@ -7,6 +7,7 @@ export interface BookSummary {
   isbn?: string[];
   isReadable?: boolean;     // True if an Internet Archive scan exists
   iaId?: string;            // Internet Archive identifier
+  provider?: 'openlibrary' | 'googlebooks';
 }
 
 export interface BookDetail extends BookSummary {

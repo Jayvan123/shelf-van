@@ -23,15 +23,17 @@ export const DiscoverPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const queryParam = searchParams.get('q') || '';
   const [page, setPage] = useState(1);
+  const [provider, setProvider] = useState<'all' | 'googlebooks' | 'openlibrary'>('all');
 
-  // Reset page to 1 when query changes
+  // Reset page to 1 when query or provider changes
   useEffect(() => {
     setPage(1);
-  }, [queryParam]);
+  }, [queryParam, provider]);
 
   const { data: searchData, isLoading: isSearchLoading, isError: isSearchError, error: searchError, isFetching } = useBookSearch(
     queryParam,
-    page
+    page,
+    provider
   );
 
   const isSearching = Boolean(queryParam.trim());
@@ -41,7 +43,7 @@ export const DiscoverPage: React.FC = () => {
       {/* Mode A: Live Search Results Grid (when user searched from the header) */}
       {isSearching ? (
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
             <h2 style={{ fontSize: '1.4rem', fontWeight: '800', margin: 0, letterSpacing: '-0.3px' }}>
               Search Results for "{queryParam}"
             </h2>
@@ -52,6 +54,38 @@ export const DiscoverPage: React.FC = () => {
             )}
           </div>
 
+          {/* Provider Filter Tabs */}
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', flexWrap: 'wrap' }}>
+            {(
+              [
+                { id: 'all', label: 'All Providers' },
+                { id: 'googlebooks', label: 'Google Books' },
+                { id: 'openlibrary', label: 'Open Library' },
+              ] as const
+            ).map((tab) => {
+              const active = provider === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setProvider(tab.id)}
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: '20px',
+                    fontSize: '0.82rem',
+                    fontWeight: active ? '600' : '500',
+                    border: active ? '1px solid #18181b' : '1px solid #e4e4e7',
+                    backgroundColor: active ? '#18181b' : '#ffffff',
+                    color: active ? '#ffffff' : '#71717a',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+
           {isSearchError && (
             <div style={{ padding: '16px', backgroundColor: '#fef2f2', color: '#991b1b', border: '1px solid #fecaca', borderRadius: '6px', marginBottom: '20px' }}>
               Notice: {searchError instanceof Error ? searchError.message : 'Search failed. Please try again.'}
@@ -60,7 +94,7 @@ export const DiscoverPage: React.FC = () => {
 
           {isSearchLoading ? (
             <div style={{ padding: '60px 0', textAlign: 'center', color: '#71717a' }}>
-              <p>Fetching search results from Open Library...</p>
+              <p>Fetching books...</p>
             </div>
           ) : searchData && searchData.books.length > 0 ? (
             <div>

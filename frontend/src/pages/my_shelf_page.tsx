@@ -247,7 +247,9 @@ export const MyShelfPage: React.FC = () => {
                   className="hide-scrollbar"
                 >
                   {shelf.map((book) => {
-                    const coverSrc = book.coverUrl ? `http://localhost:3000${book.coverUrl}` : undefined;
+                    const coverSrc = book.coverUrl
+                      ? (book.coverUrl.startsWith('http') ? book.coverUrl : `http://localhost:3000${book.coverUrl}`)
+                      : undefined;
                     const isHovered = hoveredKey === book.key;
 
                     return (
