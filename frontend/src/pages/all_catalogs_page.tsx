@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { ALL_CATALOG_CATEGORIES, type CatalogGenre } from '../constants/catalogs.ts';
 import { useSubjectBooks } from '../api/hooks.ts';
 import { BookCard } from '../components/BookCard.tsx';
@@ -60,27 +60,26 @@ export const AllCatalogsPage: React.FC = () => {
             gap: '12px',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <button
-              onClick={() => {
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <Link
+              to="/catalogs"
+              onClick={(e) => {
+                e.preventDefault();
                 setSearchParams({});
                 setPage(1);
               }}
               style={{
-                background: 'none',
-                border: '1px solid #d4d4d8',
-                borderRadius: '6px',
-                padding: '6px 14px',
-                fontSize: '0.88rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                color: '#18181b',
-                backgroundColor: '#ffffff',
+                fontSize: '1.35rem',
+                fontWeight: '700',
+                letterSpacing: '-0.3px',
+                color: '#71717a',
+                textDecoration: 'none',
               }}
             >
-              &larr; All Catalogs
-            </button>
-            <h2 style={{ fontSize: '1.4rem', fontWeight: '800', margin: 0, letterSpacing: '-0.3px' }}>
+              Catalogs
+            </Link>
+            <span style={{ fontSize: '1.2rem', color: '#d4d4d8' }}>/</span>
+            <h2 style={{ fontSize: '1.35rem', fontWeight: '800', margin: 0, letterSpacing: '-0.3px', color: '#18181b' }}>
               {genreTitle}
             </h2>
           </div>
@@ -150,7 +149,7 @@ export const AllCatalogsPage: React.FC = () => {
                   fontWeight: '600',
                 }}
               >
-                &larr; Previous Page
+                Previous
               </button>
               <span style={{ fontSize: '0.9rem', color: '#52525b', fontWeight: '500' }}>Page {page}</span>
               <button
@@ -168,7 +167,7 @@ export const AllCatalogsPage: React.FC = () => {
                   fontWeight: '600',
                 }}
               >
-                Next Page &rarr;
+                Next
               </button>
             </div>
           </div>

@@ -125,7 +125,7 @@ export const DiscoverPage: React.FC = () => {
                     fontWeight: '600',
                   }}
                 >
-                  &larr; Previous Page
+                  Previous
                 </button>
                 <span style={{ fontSize: '0.9rem', color: '#52525b', fontWeight: '500' }}>Page {page}</span>
                 <button
@@ -140,7 +140,7 @@ export const DiscoverPage: React.FC = () => {
                     fontWeight: '600',
                   }}
                 >
-                  Next Page &rarr;
+                  Next
                 </button>
               </div>
             </div>

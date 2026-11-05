@@ -20,7 +20,7 @@ export const ReaderPage: React.FC = () => {
         <p style={{ color: '#c00' }}>
           Error: {error instanceof Error ? error.message : 'Failed to load reader.'}
         </p>
-        <Link to="/">&larr; Back to Shelf</Link>
+        <Link to="/" style={{ color: '#64b5f6', textDecoration: 'none', fontWeight: '500' }}>My Shelf</Link>
       </div>
     );
   }
@@ -46,11 +46,11 @@ export const ReaderPage: React.FC = () => {
           </span>
         </div>
 
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <Link to={`/book/${book.key}`} style={{ color: '#64b5f6' }}>
-            &larr; Book Details
+        <div style={{ display: 'flex', gap: '16px' }}>
+          <Link to={`/book/${book.key}`} style={{ color: '#64b5f6', textDecoration: 'none', fontWeight: '500' }}>
+            Book Details
           </Link>
-          <Link to="/" style={{ color: '#64b5f6' }}>
+          <Link to="/" style={{ color: '#64b5f6', textDecoration: 'none', fontWeight: '500' }}>
             My Shelf
           </Link>
         </div>
@@ -104,15 +104,15 @@ export const ReaderPage: React.FC = () => {
                 Try one of these public-domain classics with 100% full-text scans:
               </p>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                <Link to="/search">
-                  <button style={{ fontSize: '0.85rem' }}>Browse Catalogs &rarr;</button>
+                <Link to="/catalogs">
+                  <button style={{ fontSize: '0.85rem' }}>Browse Catalogs</button>
                 </Link>
               </div>
             </div>
 
             <p style={{ marginTop: '24px' }}>
-              <Link to={`/book/${book.key}`} style={{ color: '#64b5f6' }}>
-                &larr; Return to Book Details
+              <Link to={`/book/${book.key}`} style={{ color: '#64b5f6', textDecoration: 'none', fontWeight: '500' }}>
+                Book Details
               </Link>
             </p>
           </div>
