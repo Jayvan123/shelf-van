@@ -36,6 +36,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd, footer }) 
         flexDirection: 'column',
         position: 'relative',
         width: '100%',
+        height: '100%',
       }}
     >
       {/* 3D Book Cover */}
@@ -165,7 +166,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd, footer }) 
       </div>
 
       {/* Title & Author */}
-      <div style={{ marginTop: '8px', padding: '0 2px' }}>
+      <div style={{ marginTop: '8px', padding: '0 2px', display: 'flex', flexDirection: 'column', flex: 1 }}>
         <Link
           to={`/book/${book.key}`}
           style={{
@@ -177,6 +178,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd, footer }) 
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
+            minHeight: '2.35em',
           }}
           title={book.title}
         >
@@ -190,11 +192,12 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd, footer }) 
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
+            minHeight: '1.2em',
           }}
         >
           {book.authors.length > 0 ? book.authors.join(', ') : 'Unknown Author'}
         </p>
-        {footer}
+        {footer && <div style={{ marginTop: 'auto', paddingTop: '8px' }}>{footer}</div>}
       </div>
     </div>
   );
