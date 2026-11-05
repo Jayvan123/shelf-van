@@ -237,16 +237,13 @@ export const TrendingMosaicRow: React.FC = () => {
         <Link
           to="/catalogs"
           style={{
-            fontSize: '0.86rem',
-            color: '#71717a',
+            fontSize: '0.88rem',
+            color: '#18181b',
             fontWeight: '600',
             textDecoration: 'none',
-            transition: 'color 0.15s ease',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = '#18181b')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = '#71717a')}
         >
-          Browse all &rarr;
+          View all
         </Link>
       </div>
 
