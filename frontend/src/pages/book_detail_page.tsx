@@ -54,7 +54,9 @@ export const BookDetailPage: React.FC = () => {
     addOrUpdateBook(book, selectedStatus);
   };
 
-  const coverSrc = book.coverUrl ? `http://localhost:3000${book.coverUrl}` : undefined;
+  const coverSrc = book.coverUrl
+    ? (book.coverUrl.startsWith('http') ? book.coverUrl : `http://localhost:3000${book.coverUrl}`)
+    : undefined;
 
   return (
     <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '24px 20px 60px 20px' }}>
@@ -132,7 +134,7 @@ export const BookDetailPage: React.FC = () => {
           </p>
 
           {/* Simple Clean Availability Badge */}
-          <div style={{ marginBottom: '24px' }}>
+          <div style={{ marginBottom: '24px', display: 'flex', gap: '8px', alignItems: 'center' }}>
             <span
               style={{
                 display: 'inline-block',
@@ -144,7 +146,22 @@ export const BookDetailPage: React.FC = () => {
                 borderRadius: '999px',
               }}
             >
-              {book.isReadable ? 'Free Digital Scan Available' : 'Print / Lending Edition'}
+              {book.isReadable
+                ? (book.provider === 'googlebooks' ? 'Digital Preview Available' : 'Free Digital Scan Available')
+                : (book.provider === 'googlebooks' ? 'Standard Edition' : 'Print / Lending Edition')}
+            </span>
+            <span
+              style={{
+                display: 'inline-block',
+                backgroundColor: '#f4f4f5',
+                color: '#71717a',
+                fontSize: '0.75rem',
+                fontWeight: '500',
+                padding: '4px 10px',
+                borderRadius: '999px',
+              }}
+            >
+              {book.provider === 'googlebooks' ? 'Google Books' : 'Open Library'}
             </span>
           </div>
 
@@ -266,7 +283,7 @@ export const BookDetailPage: React.FC = () => {
                   textDecoration: 'none',
                 }}
               >
-                Open Library
+                {book.provider === 'googlebooks' ? 'Google Books' : 'Open Library'}
                 <ExternalLink size={13} />
               </a>
             )}

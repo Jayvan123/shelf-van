@@ -153,7 +153,10 @@ export const FeaturedBanner: React.FC = () => {
         className="hide-scrollbar"
       >
         {bannerBooks.map((book, index) => {
-          const coverSrc = 'coverUrl' in book && book.coverUrl ? `http://localhost:3000${book.coverUrl}` : undefined;
+          const coverSrc =
+            'coverUrl' in book && book.coverUrl
+              ? (book.coverUrl.startsWith('http') ? book.coverUrl : `http://localhost:3000${book.coverUrl}`)
+              : undefined;
 
           return (
             <Link

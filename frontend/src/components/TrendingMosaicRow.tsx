@@ -86,7 +86,7 @@ export const TrendingMosaicRow: React.FC = () => {
   const renderCover = (book: TrendingBook, isTall: boolean) => {
     const isHovered = hoveredKey === book.key;
     const coverSrc = book.coverUrl
-      ? `http://localhost:3000${book.coverUrl}`
+      ? (book.coverUrl.startsWith('http') ? book.coverUrl : `http://localhost:3000${book.coverUrl}`)
       : book.coverId
       ? `https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg`
       : undefined;

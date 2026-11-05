@@ -15,7 +15,9 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd, footer }) 
   const shelfEntry = getBook(book.key);
   const [isHovered, setIsHovered] = useState(false);
 
-  const coverSrc = book.coverUrl ? `http://localhost:3000${book.coverUrl}` : undefined;
+  const coverSrc = book.coverUrl
+    ? (book.coverUrl.startsWith('http') ? book.coverUrl : `http://localhost:3000${book.coverUrl}`)
+    : undefined;
 
   const handleAdd = (e: React.MouseEvent, status: ReadingStatus) => {
     e.preventDefault();
@@ -91,7 +93,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd, footer }) 
                 {book.title}
               </span>
               <span style={{ fontSize: '0.7rem', color: '#71717a', marginTop: '6px' }}>
-                {book.authors[0] || 'Open Library'}
+                {book.authors[0] || (book.provider === 'googlebooks' ? 'Google Books' : 'Open Library')}
               </span>
             </div>
           )}
