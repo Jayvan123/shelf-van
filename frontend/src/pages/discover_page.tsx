@@ -4,6 +4,7 @@ import { useBookSearch } from '../api/hooks.ts';
 import { BookCard } from '../components/BookCard.tsx';
 import { BookRow } from '../components/BookRow.tsx';
 import { FeaturedBanner } from '../components/FeaturedBanner.tsx';
+import { TrendingMosaicRow } from '../components/TrendingMosaicRow.tsx';
 
 // Predefined rows for the Discover screen
 const DISCOVER_ROWS = [
@@ -120,6 +121,9 @@ export const DiscoverPage: React.FC = () => {
         <div>
           {/* Big Featured Hero Banner matching the uploaded image */}
           <FeaturedBanner />
+
+          {/* Mosaic Trending & Most Read Row (Pinterest/Bento style from reference) */}
+          <TrendingMosaicRow />
 
           {/* Horizontally Scrollable Category Rows */}
           {DISCOVER_ROWS.map((row) => (
