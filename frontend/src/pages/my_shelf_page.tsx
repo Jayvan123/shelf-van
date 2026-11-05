@@ -157,10 +157,16 @@ export const MyShelfPage: React.FC = () => {
               <span
                 style={{
                   fontSize: '0.74rem',
-                  padding: '1px 6px',
+                  minWidth: '20px',
+                  height: '20px',
+                  padding: '0 6px',
                   borderRadius: '999px',
                   backgroundColor: isActive ? '#27272a' : '#f4f4f5',
                   color: isActive ? '#ffffff' : '#71717a',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlign: 'center',
                 }}
               >
                 {count}
@@ -535,13 +541,32 @@ export const MyShelfPage: React.FC = () => {
               </Link>
             </div>
           ) : (
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-                gap: '28px 18px',
-              }}
-            >
+            <div>
+              {/* Centered Number of Books */}
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '24px' }}>
+                <span
+                  style={{
+                    display: 'inline-block',
+                    fontSize: '0.88rem',
+                    fontWeight: '600',
+                    color: '#71717a',
+                    backgroundColor: '#f4f4f5',
+                    padding: '4px 14px',
+                    borderRadius: '999px',
+                  }}
+                >
+                  {filteredBooks.length} {filteredBooks.length === 1 ? 'book' : 'books'}
+                </span>
+              </div>
+
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 200px))',
+                  justifyContent: 'center',
+                  gap: '28px 18px',
+                }}
+              >
               {filteredBooks.map((book) => (
                 <BookCard
                   key={book.key}
@@ -607,6 +632,7 @@ export const MyShelfPage: React.FC = () => {
                 />
               ))}
             </div>
+          </div>
           )}
         </div>
       )}
