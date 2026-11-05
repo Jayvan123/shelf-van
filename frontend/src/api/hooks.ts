@@ -1,10 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { searchBooks, getSubjectBooks, getBookDetail, ApiError } from './client.ts';
 
-export function useBookSearch(query: string, page: number = 1) {
+export function useBookSearch(
+  query: string,
+  page: number = 1,
+  provider: 'all' | 'openlibrary' | 'googlebooks' = 'all'
+) {
   return useQuery({
-    queryKey: ['search', query.trim(), page],
-    queryFn: () => searchBooks(query, page),
+    queryKey: ['search', query.trim(), page, provider],
+    queryFn: () => searchBooks(query, page, provider),
     enabled: query.trim().length > 0,
     staleTime: 5 * 60 * 1000,
     retry: (failureCount, error) => {

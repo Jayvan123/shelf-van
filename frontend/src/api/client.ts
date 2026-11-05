@@ -14,17 +14,22 @@ export class ApiError extends Error {
   }
 }
 
-export async function searchBooks(query: string, page: number = 1): Promise<SearchResponse> {
+export async function searchBooks(
+  query: string,
+  page: number = 1,
+  provider?: 'all' | 'openlibrary' | 'googlebooks'
+): Promise<SearchResponse> {
   const trimmed = query.trim();
   if (!trimmed) {
     return { total: 0, page: 1, books: [] };
   }
 
-  const url = `${API_BASE}/search?q=${encodeURIComponent(trimmed)}&page=${page}`;
+  const providerParam = provider ? `&provider=${encodeURIComponent(provider)}` : '';
+  const url = `${API_BASE}/search?q=${encodeURIComponent(trimmed)}&page=${page}${providerParam}`;
   const response = await fetch(url);
 
   if (response.status === 429) {
-    throw new ApiError('Open Library is currently rate-limited. Please wait a moment and try again.', 429, 'RATE_LIMITED');
+    throw new ApiError('Book service is currently busy. Please wait a moment and try again.', 429, 'RATE_LIMITED');
   }
 
   if (!response.ok) {

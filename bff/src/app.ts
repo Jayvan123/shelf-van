@@ -16,7 +16,11 @@ import {
   type OpenLibrarySearchRawResponse,
   type OpenLibrarySubjectRawResponse,
 } from './normalizers.js';
-import type { BookDetail, SearchResponse } from './types.js';
+import {
+  searchGoogleBooks,
+  getGoogleBookDetail,
+} from './googleBooks.js';
+import type { BookDetail, BookSummary, SearchResponse } from './types.js';
 
 export const app = new Hono();
 
@@ -36,11 +40,12 @@ app.get('/api/health', (c) => {
   return c.json({ status: 'ok', service: 'ShelfVan BFF', timestamp: new Date().toISOString() });
 });
 
-// GET /api/search?q={query}&page={page}
+// GET /api/search?q={query}&page={page}&provider={all|openlibrary|googlebooks}
 app.get('/api/search', async (c) => {
   const query = c.req.query('q') || '';
   const pageStr = c.req.query('page') || '1';
   const page = Math.max(1, parseInt(pageStr, 10) || 1);
+  const provider = (c.req.query('provider') || 'all').toLowerCase();
 
   const trimmedQuery = query.trim();
   if (!trimmedQuery) {
@@ -48,29 +53,93 @@ app.get('/api/search', async (c) => {
     return c.json(emptyResponse);
   }
 
-  const cacheKey = `search:${trimmedQuery.toLowerCase()}:${page}`;
+  const cacheKey = `search:${provider}:${trimmedQuery.toLowerCase()}:${page}`;
   const cached = cacheStore.get<SearchResponse>(cacheKey);
   if (cached) {
-    console.log(`[Cache Hit] Search: "${trimmedQuery}" (Page ${page})`);
+    console.log(`[Cache Hit] Search: "${trimmedQuery}" (${provider}, Page ${page})`);
     return c.json(cached);
   }
 
-  try {
-    const path = `/search.json?q=${encodeURIComponent(trimmedQuery)}&page=${page}&limit=20`;
-    const raw = await fetchFromOpenLibrary<OpenLibrarySearchRawResponse>(path);
-    const normalized = normalizeSearchResponse(raw, page);
-
-    cacheStore.set(cacheKey, normalized, TTL_SEARCH);
-    return c.json(normalized);
-  } catch (err: unknown) {
-    if (err instanceof RateLimitError) {
-      return c.json({ error: err.message, code: 'RATE_LIMITED' }, 429);
+  // 1. Google Books only
+  if (provider === 'googlebooks') {
+    try {
+      const gbResponse = await searchGoogleBooks(trimmedQuery, page, 20);
+      cacheStore.set(cacheKey, gbResponse, TTL_SEARCH);
+      return c.json(gbResponse);
+    } catch (err: unknown) {
+      console.error('[Google Books Search Error]', err);
+      return c.json({ error: 'Failed to search Google Books', code: 'GOOGLE_BOOKS_ERROR' }, 500);
     }
-    if (err instanceof OpenLibraryError) {
-      return c.json({ error: err.message, code: 'OPEN_LIBRARY_ERROR' }, err.status as 400 | 500);
-    }
-    return c.json({ error: 'Internal server error while searching', code: 'INTERNAL_ERROR' }, 500);
   }
+
+  // 2. Open Library only
+  if (provider === 'openlibrary') {
+    try {
+      const path = `/search.json?q=${encodeURIComponent(trimmedQuery)}&page=${page}&limit=20`;
+      const raw = await fetchFromOpenLibrary<OpenLibrarySearchRawResponse>(path);
+      const normalized = normalizeSearchResponse(raw, page);
+      cacheStore.set(cacheKey, normalized, TTL_SEARCH);
+      return c.json(normalized);
+    } catch (err: unknown) {
+      if (err instanceof RateLimitError) {
+        return c.json({ error: err.message, code: 'RATE_LIMITED' }, 429);
+      }
+      if (err instanceof OpenLibraryError) {
+        return c.json({ error: err.message, code: 'OPEN_LIBRARY_ERROR' }, err.status as 400 | 500);
+      }
+      return c.json({ error: 'Internal server error while searching', code: 'INTERNAL_ERROR' }, 500);
+    }
+  }
+
+  // 3. Unified Search ('all'): Query both Google Books and Open Library concurrently
+  const [olResult, gbResult] = await Promise.allSettled([
+    (async () => {
+      const path = `/search.json?q=${encodeURIComponent(trimmedQuery)}&page=${page}&limit=15`;
+      const raw = await fetchFromOpenLibrary<OpenLibrarySearchRawResponse>(path);
+      return normalizeSearchResponse(raw, page);
+    })(),
+    searchGoogleBooks(trimmedQuery, page, 15),
+  ]);
+
+  const olBooks = olResult.status === 'fulfilled' ? olResult.value.books : [];
+  const gbBooks = gbResult.status === 'fulfilled' ? gbResult.value.books : [];
+  const olTotal = olResult.status === 'fulfilled' ? olResult.value.total : 0;
+  const gbTotal = gbResult.status === 'fulfilled' ? gbResult.value.total : 0;
+
+  // Interleave and deduplicate results
+  const combinedBooks: BookSummary[] = [];
+  const seenTitles = new Set<string>();
+
+  const pushBook = (book: BookSummary) => {
+    const normTitle = book.title.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (!normTitle || seenTitles.has(normTitle)) return;
+    seenTitles.add(normTitle);
+    combinedBooks.push(book);
+  };
+
+  const maxLen = Math.max(gbBooks.length, olBooks.length);
+  for (let i = 0; i < maxLen; i++) {
+    // Interleave: Google Books (great for modern titles/wattpad/web novels) and Open Library (great for scans)
+    if (i < gbBooks.length) pushBook(gbBooks[i]);
+    if (i < olBooks.length) pushBook(olBooks[i]);
+  }
+
+  // If both failed, return an error
+  if (olResult.status === 'rejected' && gbResult.status === 'rejected') {
+    return c.json(
+      { error: 'All book providers failed to respond. Please try again.', code: 'PROVIDERS_UNAVAILABLE' },
+      502
+    );
+  }
+
+  const mergedResponse: SearchResponse = {
+    total: Math.max(olTotal + gbTotal, combinedBooks.length),
+    page,
+    books: combinedBooks,
+  };
+
+  cacheStore.set(cacheKey, mergedResponse, TTL_SEARCH);
+  return c.json(mergedResponse);
 });
 
 // GET /api/subjects/:subject?page={page}
@@ -124,6 +193,19 @@ app.get('/api/books/:key', async (c) => {
   if (cached) {
     console.log(`[Cache Hit] Book Detail: "${cleanKey}"`);
     return c.json(cached);
+  }
+
+  // Handle Google Books provider
+  if (cleanKey.startsWith('gb_') || cleanKey.startsWith('gb:')) {
+    const volumeId = cleanKey.replace(/^gb[_:]/, '');
+    try {
+      const bookDetail = await getGoogleBookDetail(volumeId);
+      cacheStore.set(cacheKey, bookDetail, TTL_BOOK_DETAIL);
+      return c.json(bookDetail);
+    } catch (err: unknown) {
+      console.error(`[Google Books Detail Error] Volume ID "${volumeId}":`, err);
+      return c.json({ error: 'Book not found on Google Books', code: 'NOT_FOUND' }, 404);
+    }
   }
 
   try {
