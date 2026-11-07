@@ -93,11 +93,11 @@ export const AllCatalogsPage: React.FC = () => {
         {isGenreError && (
           <div
             style={{
-              padding: '16px',
+              padding: '16px 20px',
               backgroundColor: '#fef2f2',
               color: '#991b1b',
               border: '1px solid #fecaca',
-              borderRadius: '6px',
+              borderRadius: '16px',
               marginBottom: '20px',
             }}
           >
@@ -140,8 +140,8 @@ export const AllCatalogsPage: React.FC = () => {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 style={{
-                  padding: '8px 18px',
-                  borderRadius: '6px',
+                  padding: '9px 24px',
+                  borderRadius: '9999px',
                   border: '1px solid #d4d4d8',
                   backgroundColor: '#fff',
                   cursor: page > 1 ? 'pointer' : 'not-allowed',
@@ -159,8 +159,8 @@ export const AllCatalogsPage: React.FC = () => {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 style={{
-                  padding: '8px 18px',
-                  borderRadius: '6px',
+                  padding: '9px 24px',
+                  borderRadius: '9999px',
                   border: '1px solid #d4d4d8',
                   backgroundColor: '#fff',
                   cursor: 'pointer',
@@ -212,8 +212,8 @@ export const AllCatalogsPage: React.FC = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           style={{
-            padding: '8px 14px',
-            borderRadius: '6px',
+            padding: '9px 18px',
+            borderRadius: '9999px',
             border: '1px solid #d4d4d8',
             fontSize: '0.9rem',
             width: '240px',
