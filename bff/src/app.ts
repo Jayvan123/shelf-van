@@ -231,6 +231,27 @@ app.get('/api/books/:key', async (c) => {
             if (parentWork) {
               workData = { ...editionRaw, ...parentWork };
             }
+
+            // If current edition has a restricted or missing IA scan, check parent work for an open scan
+            const currentIa = String(editionRaw.ocaid || (Array.isArray(editionRaw.ia) ? editionRaw.ia[0] : editionRaw.ia) || '');
+            if (!currentIa || currentIa.toLowerCase().startsWith('bwb_') || currentIa.toLowerCase().includes('0000')) {
+              try {
+                const editionsRaw = await fetchFromOpenLibrary<{ entries?: Record<string, unknown>[] }>(
+                  `/works/${workClean}/editions.json?limit=25`
+                );
+                if (Array.isArray(editionsRaw.entries)) {
+                  const openEdition = editionsRaw.entries.find((e) => {
+                    const id = String(e.ocaid || (Array.isArray(e.ia) ? e.ia[0] : e.ia) || '');
+                    return id && !id.toLowerCase().startsWith('bwb_') && !id.toLowerCase().startsWith('daisy_') && !id.toLowerCase().includes('0000');
+                  });
+                  if (openEdition) {
+                    topEdition = openEdition;
+                  }
+                }
+              } catch {
+                // Non-critical
+              }
+            }
           } catch {
             // Non-critical if work fetch fails
           }
@@ -246,9 +267,26 @@ app.get('/api/books/:key', async (c) => {
           `/works/${cleanKey}/editions.json?limit=25`
         );
         if (Array.isArray(editionsRaw.entries) && editionsRaw.entries.length > 0) {
-          const readableEdition = editionsRaw.entries.find(
-            (e) => Boolean(e.ocaid) || Boolean(e.ia) || (Array.isArray(e.ia_loaded_id) && e.ia_loaded_id.length > 0)
-          );
+          // Helper to extract IA ID from edition
+          const getIaId = (e: Record<string, unknown>): string => {
+            if (typeof e.ocaid === 'string' && e.ocaid.trim()) return e.ocaid.trim();
+            if (Array.isArray(e.ia) && e.ia.length > 0 && typeof e.ia[0] === 'string') return e.ia[0].trim();
+            if (typeof e.ia === 'string' && e.ia.trim()) return e.ia.trim();
+            if (Array.isArray(e.ia_loaded_id) && e.ia_loaded_id.length > 0) return String(e.ia_loaded_id[0]).trim();
+            return '';
+          };
+
+          const isOpenScan = (id: string): boolean => {
+            if (!id) return false;
+            const lower = id.toLowerCase();
+            return !lower.startsWith('bwb_') && !lower.startsWith('daisy_') && !lower.includes('0000');
+          };
+
+          // Priority 1: An edition with an open public scan (fully readable in iframe without CDL lock)
+          const openEdition = editionsRaw.entries.find((e) => isOpenScan(getIaId(e)));
+
+          // Priority 2: Any edition with a scan
+          const readableEdition = openEdition || editionsRaw.entries.find((e) => Boolean(getIaId(e)));
           topEdition = readableEdition || editionsRaw.entries[0] || null;
         }
       } catch {
@@ -259,11 +297,22 @@ app.get('/api/books/:key', async (c) => {
       if (!topEdition?.ocaid && !topEdition?.ia) {
         try {
           const workSearch = await fetchFromOpenLibrary<{ docs?: Array<{ ia?: string[] | string }> }>(
-            `/search.json?q=key:/works/${cleanKey}&fields=ia&limit=1`
+            `/search.json?q=key:/works/${cleanKey}&fields=ia&limit=5`
           );
-          const firstDoc = workSearch.docs?.[0];
-          if (firstDoc?.ia) {
-            iaFallback = Array.isArray(firstDoc.ia) ? firstDoc.ia[0] : firstDoc.ia;
+          const docs = workSearch.docs || [];
+          for (const doc of docs) {
+            const iaList = Array.isArray(doc.ia) ? doc.ia : (doc.ia ? [doc.ia] : []);
+            const openIa = iaList.find((id) => {
+              const lower = id.toLowerCase();
+              return !lower.startsWith('bwb_') && !lower.startsWith('daisy_') && !lower.includes('0000');
+            });
+            if (openIa) {
+              iaFallback = openIa;
+              break;
+            }
+            if (!iaFallback && iaList.length > 0) {
+              iaFallback = iaList[0];
+            }
           }
         } catch {
           // Non-critical

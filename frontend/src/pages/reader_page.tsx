@@ -8,7 +8,6 @@ export const ReaderPage: React.FC = () => {
   const { data: book, isLoading, isError, error } = useBookDetail(key);
   const [viewMode, setViewMode] = useState<'2up' | '1up'>('2up');
   const [reloadKey, setReloadKey] = useState(0);
-  const [showTip, setShowTip] = useState(true);
 
   if (isLoading) {
     return (
@@ -24,7 +23,7 @@ export const ReaderPage: React.FC = () => {
         }}
       >
         <BookOpen size={36} style={{ opacity: 0.6, marginBottom: '16px' }} />
-        <p style={{ fontSize: '1rem', fontWeight: '600' }}>Loading reader preview...</p>
+        <p style={{ fontSize: '1rem', fontWeight: '600' }}>Loading reader...</p>
         <span style={{ fontSize: '0.82rem', color: '#71717a' }}>Preparing pages from Open Library & Archive.org</span>
       </div>
     );
@@ -43,7 +42,7 @@ export const ReaderPage: React.FC = () => {
     );
   }
 
-  // Construct active reader embed URL starting at page 1 / cover
+  // Construct active reader embed URL starting at page 1
   const readerSrc = book.iaId
     ? `https://archive.org/embed/${encodeURIComponent(book.iaId)}?ui=embed#page/n0/mode/${viewMode}`
     : book.readerUrl;
@@ -221,9 +220,9 @@ export const ReaderPage: React.FC = () => {
                 fontSize: '0.82rem',
                 boxShadow: '0 2px 6px rgba(37, 99, 235, 0.3)',
               }}
-              title="Borrow for free on Archive.org to unlock all pages"
+              title="Open full reader on Archive.org"
             >
-              <span>Unlock All Pages</span>
+              <span>Archive.org</span>
               <ExternalLink size={13} />
             </a>
           )}
@@ -245,7 +244,7 @@ export const ReaderPage: React.FC = () => {
               fontSize: '0.8rem',
               border: '1px solid #3f3f46',
             }}
-            title="Read free public domain text on Project Gutenberg"
+            title="Read free full text on Project Gutenberg"
           >
             <span>Gutenberg</span>
             <ExternalLink size={12} />
@@ -266,85 +265,7 @@ export const ReaderPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Helpful Lending/Restricted Tip Bar */}
-      {showTip && readerSrc && (
-        <div
-          style={{
-            backgroundColor: '#1f2937',
-            borderBottom: '1px solid #374151',
-            padding: '7px 16px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            fontSize: '0.8rem',
-            color: '#e5e7eb',
-            gap: '12px',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-            <span
-              style={{
-                backgroundColor: '#f59e0b',
-                color: '#18181b',
-                fontSize: '0.68rem',
-                fontWeight: '800',
-                padding: '1px 6px',
-                borderRadius: '4px',
-                letterSpacing: '0.3px',
-              }}
-            >
-              READING TIP
-            </span>
-            <span>
-              If this book skips to the back cover, it is a copyrighted title in Internet Archive's Lending Library.
-            </span>
-            {archiveDetailsUrl ? (
-              <a
-                href={archiveDetailsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  color: '#60a5fa',
-                  fontWeight: '700',
-                  textDecoration: 'underline',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '3px',
-                }}
-              >
-                Click here to borrow for free and unlock all 300+ pages &rarr;
-              </a>
-            ) : book.previewUrl ? (
-              <a
-                href={book.previewUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: '#60a5fa', fontWeight: '600', textDecoration: 'underline' }}
-              >
-                View full book options &rarr;
-              </a>
-            ) : null}
-          </div>
-
-          <button
-            onClick={() => setShowTip(false)}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#9ca3af',
-              cursor: 'pointer',
-              fontSize: '1.1rem',
-              lineHeight: 1,
-              padding: '0 4px',
-            }}
-            title="Dismiss tip"
-          >
-            &times;
-          </button>
-        </div>
-      )}
-
-      {/* Reader Frame or Fallback */}
+      {/* Reader Frame */}
       <div style={{ flex: 1, backgroundColor: '#000000', position: 'relative' }}>
         {readerSrc ? (
           <iframe
@@ -373,7 +294,7 @@ export const ReaderPage: React.FC = () => {
             <p style={{ color: '#a1a1aa', lineHeight: '1.6', fontSize: '0.9rem' }}>
               {book.provider === 'googlebooks'
                 ? 'This title does not provide an open iframe preview from Google Books.'
-                : 'This book scan is managed under controlled lending or physical library archives.'}
+                : 'This book scan is managed under physical library archives.'}
             </p>
 
             <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '24px', flexWrap: 'wrap' }}>
