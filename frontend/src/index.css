@@ -32,7 +32,7 @@ a {
 /* Realistic Book Cover Effect */
 .book-cover {
   position: relative;
-  border-radius: 2px 6px 6px 2px;
+  border-radius: 4px 12px 12px 4px;
   overflow: hidden;
   background-color: #f4f4f5;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
