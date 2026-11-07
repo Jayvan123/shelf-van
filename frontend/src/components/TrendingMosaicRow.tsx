@@ -102,7 +102,7 @@ export const TrendingMosaicRow: React.FC = () => {
           position: 'relative',
           width: '100%',
           height: isTall ? '318px' : '153px',
-          borderRadius: '8px',
+          borderRadius: '16px',
           overflow: 'hidden',
           backgroundColor: '#27272a',
           boxShadow: isHovered
