@@ -106,11 +106,9 @@ export function normalizeGoogleBookDetail(item: GoogleVolumeItem): BookDetail {
   const info = item.volumeInfo || {};
   const access = item.accessInfo;
 
-  // When embeddable, use Google's official embed URL for the iframe reader
+  // When embeddable, use Google's official embed URL for the iframe reader (webReaderLink cannot be iframed)
   const readerUrl = access?.embeddable
     ? `https://books.google.com/books?id=${encodeURIComponent(item.id)}&lpg=PP1&pg=PP1&output=embed`
-    : access?.webReaderLink
-    ? access.webReaderLink.replace(/^http:\/\//i, 'https://')
     : undefined;
 
   const previewUrl =
