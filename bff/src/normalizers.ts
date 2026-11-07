@@ -192,8 +192,12 @@ export function normalizeBookDetail(
   }
 
   const isReadable = Boolean(iaId);
-  const readerUrl = iaId ? `https://archive.org/embed/${encodeURIComponent(iaId)}` : undefined;
-  const previewUrl = `https://openlibrary.org/works/${cleanKey}`;
+  const readerUrl = iaId
+    ? `https://archive.org/embed/${encodeURIComponent(iaId)}?ui=embed#page/n0/mode/2up`
+    : undefined;
+  const previewUrl = cleanKey.toUpperCase().endsWith('M')
+    ? `https://openlibrary.org/books/${cleanKey}`
+    : `https://openlibrary.org/works/${cleanKey}`;
 
   return {
     key: cleanKey,
