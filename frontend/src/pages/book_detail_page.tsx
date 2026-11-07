@@ -223,7 +223,7 @@ export const BookDetailPage: React.FC = () => {
             style={{
               width: '190px',
               height: '275px',
-              borderRadius: '8px',
+              borderRadius: '16px',
               overflow: 'hidden',
               boxShadow: '0 10px 25px rgba(0,0,0,0.22)',
               backgroundColor: '#18181b',
@@ -415,9 +415,9 @@ export const BookDetailPage: React.FC = () => {
                 style={{
                   background: 'none',
                   border: '1px solid #e4e4e7',
-                  borderRadius: '20px',
-                  padding: '7px 14px',
-                  fontSize: '0.82rem',
+                  borderRadius: '9999px',
+                  padding: '9px 18px',
+                  fontSize: '0.84rem',
                   fontWeight: '600',
                   color: '#52525b',
                   cursor: 'pointer',
@@ -434,11 +434,12 @@ export const BookDetailPage: React.FC = () => {
                     left: '160px',
                     backgroundColor: '#ffffff',
                     border: '1px solid #e4e4e7',
-                    borderRadius: '8px',
+                    borderRadius: '16px',
                     boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
                     zIndex: 20,
-                    minWidth: '160px',
+                    minWidth: '170px',
                     overflow: 'hidden',
+                    padding: '6px',
                   }}
                 >
                   {(['want_to_read', 'reading', 'completed'] as ReadingStatus[]).map((st) => (
@@ -451,6 +452,7 @@ export const BookDetailPage: React.FC = () => {
                         textAlign: 'left',
                         padding: '10px 14px',
                         border: 'none',
+                        borderRadius: '10px',
                         background: selectedStatus === st ? '#f4f4f5' : 'transparent',
                         fontSize: '0.84rem',
                         fontWeight: selectedStatus === st ? '700' : '500',
@@ -570,8 +572,8 @@ export const BookDetailPage: React.FC = () => {
                       color: '#52525b',
                       fontSize: '0.78rem',
                       fontWeight: '500',
-                      padding: '4px 10px',
-                      borderRadius: '4px',
+                      padding: '5px 14px',
+                      borderRadius: '9999px',
                     }}
                   >
                     {tag.toLowerCase()}
@@ -620,8 +622,8 @@ export const BookDetailPage: React.FC = () => {
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  padding: '12px 16px',
-                  borderRadius: '6px',
+                  padding: '12px 18px',
+                  borderRadius: '16px',
                   border: '1px solid #e4e4e7',
                   backgroundColor: '#ffffff',
                   marginBottom: '36px',
@@ -633,8 +635,8 @@ export const BookDetailPage: React.FC = () => {
                   <span
                     style={{
                       backgroundColor: '#f4f4f5',
-                      padding: '3px 8px',
-                      borderRadius: '4px',
+                      padding: '4px 12px',
+                      borderRadius: '9999px',
                       fontSize: '0.78rem',
                       color: '#52525b',
                     }}
@@ -653,9 +655,9 @@ export const BookDetailPage: React.FC = () => {
                   display: 'grid',
                   gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
                   gap: '20px',
-                  padding: '20px',
+                  padding: '24px',
                   backgroundColor: '#fafafa',
-                  borderRadius: '8px',
+                  borderRadius: '18px',
                   border: '1px solid #e4e4e7',
                 }}
               >
@@ -703,7 +705,7 @@ export const BookDetailPage: React.FC = () => {
           </span>
           <div
             style={{
-              borderRadius: '12px',
+              borderRadius: '20px',
               background: 'linear-gradient(135deg, #18181b 0%, #27272a 60%, #1e1e24 100%)',
               color: '#ffffff',
               padding: '24px 20px',
@@ -727,8 +729,8 @@ export const BookDetailPage: React.FC = () => {
                 color: '#18181b',
                 fontWeight: '700',
                 fontSize: '0.82rem',
-                padding: '9px 18px',
-                borderRadius: '999px',
+                padding: '10px 22px',
+                borderRadius: '9999px',
                 textDecoration: 'none',
                 boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
               }}
@@ -782,9 +784,9 @@ export const BookDetailPage: React.FC = () => {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '12px',
-                    padding: '8px 10px',
+                    padding: '8px 12px',
                     backgroundColor: '#ffffff',
-                    borderRadius: '8px',
+                    borderRadius: '16px',
                     border: '1px solid #f0f0f2',
                     boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
                     textDecoration: 'none',
@@ -809,7 +811,7 @@ export const BookDetailPage: React.FC = () => {
                       width: '68px',
                       height: '96px',
                       flexShrink: 0,
-                      borderRadius: '4px',
+                      borderRadius: '10px',
                       overflow: 'hidden',
                       backgroundColor: '#27272a',
                     }}
