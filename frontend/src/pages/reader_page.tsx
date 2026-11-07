@@ -1,76 +1,264 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { ArrowLeft, ExternalLink, RotateCcw, BookOpen } from 'lucide-react';
 import { useBookDetail } from '../api/hooks.ts';
 
 export const ReaderPage: React.FC = () => {
   const { key } = useParams<{ key: string }>();
   const { data: book, isLoading, isError, error } = useBookDetail(key);
+  const [viewMode, setViewMode] = useState<'2up' | '1up'>('2up');
+  const [reloadKey, setReloadKey] = useState(0);
+  const [showTip, setShowTip] = useState(true);
 
   if (isLoading) {
     return (
-      <div style={{ padding: '24px 16px' }}>
-        <p>Loading reading preview via ShelfVan...</p>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100vh',
+          backgroundColor: '#18181b',
+          color: '#ffffff',
+        }}
+      >
+        <BookOpen size={36} style={{ opacity: 0.6, marginBottom: '16px' }} />
+        <p style={{ fontSize: '1rem', fontWeight: '600' }}>Loading reader preview...</p>
+        <span style={{ fontSize: '0.82rem', color: '#71717a' }}>Preparing pages from Open Library & Archive.org</span>
       </div>
     );
   }
 
   if (isError || !book) {
     return (
-      <div style={{ padding: '24px 16px' }}>
-        <p style={{ color: '#c00' }}>
-          Error: {error instanceof Error ? error.message : 'Failed to load reader.'}
+      <div style={{ padding: '48px 20px', maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
+        <p style={{ color: '#ef4444', fontWeight: '600', marginBottom: '16px' }}>
+          {error instanceof Error ? error.message : 'Failed to load reader.'}
         </p>
-        <Link to="/" style={{ color: '#64b5f6', textDecoration: 'none', fontWeight: '500' }}>My Shelf</Link>
+        <Link to="/" style={{ color: '#2563eb', textDecoration: 'none', fontWeight: '600' }}>
+          &larr; Back to My Shelf
+        </Link>
       </div>
     );
   }
 
+  // Construct active reader embed URL starting at page 1 / cover
+  const readerSrc = book.iaId
+    ? `https://archive.org/embed/${encodeURIComponent(book.iaId)}?ui=embed#page/n0/mode/${viewMode}`
+    : book.readerUrl;
+
+  const handleRestart = () => {
+    setReloadKey((prev) => prev + 1);
+  };
+
+  const gutenbergUrl = `https://www.gutenberg.org/ebooks/search/?query=${encodeURIComponent(book.title)}`;
+  const archiveDetailsUrl = book.iaId
+    ? `https://archive.org/details/${encodeURIComponent(book.iaId)}`
+    : undefined;
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', margin: 0, padding: 0 }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
+        margin: 0,
+        padding: 0,
+        backgroundColor: '#09090b',
+        color: '#ffffff',
+        overflow: 'hidden',
+      }}
+    >
       {/* Reader Control Header */}
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          padding: '8px 16px',
-          backgroundColor: '#222',
-          color: '#fff',
-          fontSize: '0.9rem',
+          padding: '10px 16px',
+          backgroundColor: '#18181b',
+          borderBottom: '1px solid #27272a',
+          fontSize: '0.88rem',
+          flexWrap: 'wrap',
+          gap: '10px',
+          zIndex: 20,
         }}
       >
-        <div>
-          <strong>Reading:</strong> {book.title}{' '}
-          <span style={{ color: '#aaa', fontSize: '0.8rem' }}>
-            ({book.authors.length > 0 ? book.authors.join(', ') : 'Unknown Author'})
-          </span>
-        </div>
-
-        <div style={{ display: 'flex', gap: '10px' }}>
+        {/* Left: Back & Title */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
           <Link
             to={`/book/${book.key}`}
             style={{
-              color: '#ffffff',
-              backgroundColor: 'rgba(255, 255, 255, 0.12)',
-              padding: '6px 14px',
-              borderRadius: '9999px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              color: '#d4d4d8',
+              textDecoration: 'none',
+              fontSize: '0.84rem',
+              fontWeight: '600',
+              padding: '5px 10px',
+              borderRadius: '8px',
+              backgroundColor: '#27272a',
+              transition: 'background-color 0.15s ease',
+            }}
+            title="Back to Book Details"
+          >
+            <ArrowLeft size={15} />
+            <span>Details</span>
+          </Link>
+
+          <div style={{ minWidth: 0 }}>
+            <p
+              style={{
+                margin: 0,
+                fontWeight: '700',
+                fontSize: '0.92rem',
+                color: '#ffffff',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '380px',
+              }}
+              title={book.title}
+            >
+              {book.title}
+            </p>
+            <span style={{ color: '#a1a1aa', fontSize: '0.78rem' }}>
+              {book.authors.length > 0 ? book.authors.join(', ') : 'Unknown Author'}
+            </span>
+          </div>
+        </div>
+
+        {/* Center: Controls (Restart & Mode Toggle) */}
+        {readerSrc && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              onClick={handleRestart}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '6px 12px',
+                borderRadius: '8px',
+                border: '1px solid #3f3f46',
+                backgroundColor: '#27272a',
+                color: '#ffffff',
+                fontSize: '0.8rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+              }}
+              title="Reload and restart reader at Page 1"
+            >
+              <RotateCcw size={13} />
+              <span>Page 1</span>
+            </button>
+
+            {book.iaId && (
+              <div
+                style={{
+                  display: 'inline-flex',
+                  backgroundColor: '#27272a',
+                  padding: '2px',
+                  borderRadius: '8px',
+                  border: '1px solid #3f3f46',
+                }}
+              >
+                <button
+                  onClick={() => setViewMode('2up')}
+                  style={{
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    border: 'none',
+                    backgroundColor: viewMode === '2up' ? '#3f3f46' : 'transparent',
+                    color: viewMode === '2up' ? '#ffffff' : '#a1a1aa',
+                    fontSize: '0.76rem',
+                    fontWeight: viewMode === '2up' ? '700' : '500',
+                    cursor: 'pointer',
+                  }}
+                  title="2-page book spread"
+                >
+                  2 Pages
+                </button>
+                <button
+                  onClick={() => setViewMode('1up')}
+                  style={{
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    border: 'none',
+                    backgroundColor: viewMode === '1up' ? '#3f3f46' : 'transparent',
+                    color: viewMode === '1up' ? '#ffffff' : '#a1a1aa',
+                    fontSize: '0.76rem',
+                    fontWeight: viewMode === '1up' ? '700' : '500',
+                    cursor: 'pointer',
+                  }}
+                  title="Single page view"
+                >
+                  1 Page
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Right: Unlock / External Readers */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {archiveDetailsUrl && (
+            <a
+              href={archiveDetailsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                backgroundColor: '#2563eb',
+                color: '#ffffff',
+                padding: '6px 14px',
+                borderRadius: '8px',
+                textDecoration: 'none',
+                fontWeight: '600',
+                fontSize: '0.82rem',
+                boxShadow: '0 2px 6px rgba(37, 99, 235, 0.3)',
+              }}
+              title="Borrow for free on Archive.org to unlock all pages"
+            >
+              <span>Unlock All Pages</span>
+              <ExternalLink size={13} />
+            </a>
+          )}
+
+          <a
+            href={gutenbergUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              backgroundColor: '#27272a',
+              color: '#d4d4d8',
+              padding: '6px 12px',
+              borderRadius: '8px',
               textDecoration: 'none',
               fontWeight: '500',
-              fontSize: '0.84rem',
+              fontSize: '0.8rem',
+              border: '1px solid #3f3f46',
             }}
+            title="Read free public domain text on Project Gutenberg"
           >
-            Book Details
-          </Link>
+            <span>Gutenberg</span>
+            <ExternalLink size={12} />
+          </a>
+
           <Link
             to="/"
             style={{
-              color: '#ffffff',
-              backgroundColor: 'rgba(255, 255, 255, 0.12)',
-              padding: '6px 14px',
-              borderRadius: '9999px',
+              color: '#a1a1aa',
+              padding: '6px 10px',
               textDecoration: 'none',
               fontWeight: '500',
-              fontSize: '0.84rem',
+              fontSize: '0.82rem',
             }}
           >
             My Shelf
@@ -78,82 +266,165 @@ export const ReaderPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Helpful Lending/Restricted Tip Bar */}
+      {showTip && readerSrc && (
+        <div
+          style={{
+            backgroundColor: '#1f2937',
+            borderBottom: '1px solid #374151',
+            padding: '7px 16px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            fontSize: '0.8rem',
+            color: '#e5e7eb',
+            gap: '12px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <span
+              style={{
+                backgroundColor: '#f59e0b',
+                color: '#18181b',
+                fontSize: '0.68rem',
+                fontWeight: '800',
+                padding: '1px 6px',
+                borderRadius: '4px',
+                letterSpacing: '0.3px',
+              }}
+            >
+              READING TIP
+            </span>
+            <span>
+              If this book skips to the back cover, it is a copyrighted title in Internet Archive's Lending Library.
+            </span>
+            {archiveDetailsUrl ? (
+              <a
+                href={archiveDetailsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  color: '#60a5fa',
+                  fontWeight: '700',
+                  textDecoration: 'underline',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '3px',
+                }}
+              >
+                Click here to borrow for free and unlock all 300+ pages &rarr;
+              </a>
+            ) : book.previewUrl ? (
+              <a
+                href={book.previewUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: '#60a5fa', fontWeight: '600', textDecoration: 'underline' }}
+              >
+                View full book options &rarr;
+              </a>
+            ) : null}
+          </div>
+
+          <button
+            onClick={() => setShowTip(false)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#9ca3af',
+              cursor: 'pointer',
+              fontSize: '1.1rem',
+              lineHeight: 1,
+              padding: '0 4px',
+            }}
+            title="Dismiss tip"
+          >
+            &times;
+          </button>
+        </div>
+      )}
+
       {/* Reader Frame or Fallback */}
-      <div style={{ flex: 1, backgroundColor: '#111' }}>
-        {book.isReadable && book.readerUrl ? (
+      <div style={{ flex: 1, backgroundColor: '#000000', position: 'relative' }}>
+        {readerSrc ? (
           <iframe
-            src={book.readerUrl}
+            key={`${readerSrc}-${reloadKey}`}
+            src={readerSrc}
             title={book.title}
             width="100%"
             height="100%"
-            style={{ border: 0, width: '100%', height: 'calc(100vh - 40px)' }}
-            allow="fullscreen"
+            style={{ border: 0, width: '100%', height: '100%', display: 'block' }}
+            allow="fullscreen; clipboard-read; clipboard-write"
           />
         ) : (
           <div
             style={{
-              padding: '48px 16px',
+              padding: '60px 20px',
               textAlign: 'center',
-              color: '#ddd',
-              maxWidth: '600px',
+              color: '#d4d4d8',
+              maxWidth: '620px',
               margin: '0 auto',
             }}
           >
-            <h3>Digital Scan / Preview Not Available</h3>
-            <p style={{ color: '#aaa', lineHeight: '1.6' }}>
+            <BookOpen size={48} style={{ opacity: 0.4, marginBottom: '16px' }} />
+            <h3 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#ffffff', margin: '0 0 10px 0' }}>
+              Digital Scan Not Directly Embeddable
+            </h3>
+            <p style={{ color: '#a1a1aa', lineHeight: '1.6', fontSize: '0.9rem' }}>
               {book.provider === 'googlebooks'
-                ? 'A full digital preview is not provided by the publisher for this title.'
-                : 'Internet Archive does not have an open public-domain scan for this specific title (many modern copyrighted books are restricted to physical library lending).'}
+                ? 'This title does not provide an open iframe preview from Google Books.'
+                : 'This book scan is managed under controlled lending or physical library archives.'}
             </p>
-            {book.previewUrl && (
-              <p style={{ margin: '16px 0' }}>
+
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '24px', flexWrap: 'wrap' }}>
+              {book.previewUrl && (
                 <a
                   href={book.previewUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: '#64b5f6', textDecoration: 'underline' }}
+                  style={{
+                    backgroundColor: '#ffffff',
+                    color: '#18181b',
+                    fontWeight: '700',
+                    fontSize: '0.86rem',
+                    padding: '10px 22px',
+                    borderRadius: '9999px',
+                    textDecoration: 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
                 >
-                  {book.provider === 'googlebooks'
-                    ? 'Check book details on Google Books &rarr;'
-                    : 'Check lending status on Open Library &rarr;'}
+                  Open on {book.provider === 'googlebooks' ? 'Google Books' : 'Open Library'}
+                  <ExternalLink size={14} />
                 </a>
-              </p>
-            )}
+              )}
 
-            <div style={{ marginTop: '24px', padding: '20px', border: '1px solid #333', borderRadius: '16px', textAlign: 'left', backgroundColor: '#18181b' }}>
-              <strong style={{ color: '#fff' }}>Want to test the Reader?</strong>
-              <p style={{ color: '#888', margin: '8px 0 16px 0', fontSize: '0.9rem' }}>
-                Try one of these public-domain classics with 100% full-text scans:
-              </p>
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                <Link to="/catalogs">
-                  <button
-                    style={{
-                      fontSize: '0.85rem',
-                      fontWeight: '600',
-                      padding: '8px 20px',
-                      borderRadius: '9999px',
-                      border: '1px solid #444',
-                      backgroundColor: '#27272a',
-                      color: '#ffffff',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Browse Catalogs
-                  </button>
-                </Link>
-              </div>
+              <a
+                href={gutenbergUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  backgroundColor: '#27272a',
+                  color: '#ffffff',
+                  fontWeight: '600',
+                  fontSize: '0.86rem',
+                  padding: '10px 22px',
+                  borderRadius: '9999px',
+                  textDecoration: 'none',
+                  border: '1px solid #3f3f46',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                Search Project Gutenberg
+                <ExternalLink size={14} />
+              </a>
             </div>
-
-            <p style={{ marginTop: '24px' }}>
-              <Link to={`/book/${book.key}`} style={{ color: '#64b5f6', textDecoration: 'none', fontWeight: '500' }}>
-                Book Details
-              </Link>
-            </p>
           </div>
         )}
       </div>
     </div>
   );
 };
-
