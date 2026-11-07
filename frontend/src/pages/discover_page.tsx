@@ -69,8 +69,8 @@ export const DiscoverPage: React.FC = () => {
                   key={tab.id}
                   onClick={() => setProvider(tab.id)}
                   style={{
-                    padding: '6px 14px',
-                    borderRadius: '20px',
+                    padding: '7px 16px',
+                    borderRadius: '9999px',
                     fontSize: '0.82rem',
                     fontWeight: active ? '600' : '500',
                     border: active ? '1px solid #18181b' : '1px solid #e4e4e7',
@@ -87,7 +87,7 @@ export const DiscoverPage: React.FC = () => {
           </div>
 
           {isSearchError && (
-            <div style={{ padding: '16px', backgroundColor: '#fef2f2', color: '#991b1b', border: '1px solid #fecaca', borderRadius: '6px', marginBottom: '20px' }}>
+            <div style={{ padding: '16px 20px', backgroundColor: '#fef2f2', color: '#991b1b', border: '1px solid #fecaca', borderRadius: '16px', marginBottom: '20px' }}>
               Notice: {searchError instanceof Error ? searchError.message : 'Search failed. Please try again.'}
             </div>
           )}
@@ -116,8 +116,8 @@ export const DiscoverPage: React.FC = () => {
                   disabled={page <= 1 || isFetching}
                   onClick={() => { setPage((p) => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   style={{
-                    padding: '8px 18px',
-                    borderRadius: '6px',
+                    padding: '9px 24px',
+                    borderRadius: '9999px',
                     border: '1px solid #d4d4d8',
                     backgroundColor: '#fff',
                     cursor: page > 1 ? 'pointer' : 'not-allowed',
@@ -132,8 +132,8 @@ export const DiscoverPage: React.FC = () => {
                   disabled={searchData.books.length < 20 || isFetching}
                   onClick={() => { setPage((p) => p + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   style={{
-                    padding: '8px 18px',
-                    borderRadius: '6px',
+                    padding: '9px 24px',
+                    borderRadius: '9999px',
                     border: '1px solid #d4d4d8',
                     backgroundColor: '#fff',
                     cursor: 'pointer',
