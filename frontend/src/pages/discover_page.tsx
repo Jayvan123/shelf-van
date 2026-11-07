@@ -5,6 +5,7 @@ import { BookCard } from '../components/BookCard.tsx';
 import { BookRow } from '../components/BookRow.tsx';
 import { FeaturedBanner } from '../components/FeaturedBanner.tsx';
 import { TrendingMosaicRow } from '../components/TrendingMosaicRow.tsx';
+import { Top10Row } from '../components/Top10Row.tsx';
 
 // Predefined rows for the Discover screen
 const DISCOVER_ROWS = [
@@ -158,6 +159,9 @@ export const DiscoverPage: React.FC = () => {
 
           {/* Mosaic Trending & Most Read Row (Pinterest/Bento style from reference) */}
           <TrendingMosaicRow />
+
+          {/* Top 10 Books Row */}
+          <Top10Row />
 
           {/* Horizontally Scrollable Category Rows */}
           {DISCOVER_ROWS.map((row) => (
