@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Trash2, LayoutGrid, Library, Eye, BookOpen, ChevronDown } from 'lucide-react';
+import { Trash2, Eye, BookOpen, ChevronDown } from 'lucide-react';
 import { useShelfStore } from '../store/useShelfStore.ts';
 import { BookCard } from '../components/BookCard.tsx';
 import type { ReadingStatus, ShelfBook } from '../types/index.ts';
@@ -62,58 +62,77 @@ export const MyShelfPage: React.FC = () => {
           </p>
         </div>
 
-        {/* View Mode Toggle: Normal Grid vs Wooden Bookshelf */}
+        {/* View Mode Toggle: BookShelf vs Grid */}
         <div
           style={{
-            display: 'inline-flex',
+            position: 'relative',
+            display: 'inline-grid',
+            gridTemplateColumns: '1fr 1fr',
             backgroundColor: '#f4f4f5',
-            padding: '4px',
+            padding: '3px',
             borderRadius: '9999px',
             border: '1px solid #e4e4e7',
+            userSelect: 'none',
+            minWidth: '180px',
           }}
         >
+          {/* Smooth sliding pill indicator */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '3px',
+              bottom: '3px',
+              left: '3px',
+              width: 'calc(50% - 3px)',
+              backgroundColor: '#ffffff',
+              borderRadius: '9999px',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)',
+              transform: viewMode === 'bookshelf' ? 'translateX(0)' : 'translateX(100%)',
+              transition: 'transform 0.25s cubic-bezier(0.2, 0, 0, 1)',
+              pointerEvents: 'none',
+            }}
+          />
+
           <button
+            type="button"
             onClick={() => setViewMode('bookshelf')}
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '7px 16px',
+              position: 'relative',
+              zIndex: 1,
+              padding: '6px 16px',
               borderRadius: '9999px',
               border: 'none',
-              backgroundColor: viewMode === 'bookshelf' ? '#ffffff' : 'transparent',
+              backgroundColor: 'transparent',
               color: viewMode === 'bookshelf' ? '#18181b' : '#71717a',
-              fontWeight: viewMode === 'bookshelf' ? '700' : '500',
+              fontWeight: viewMode === 'bookshelf' ? '600' : '500',
               fontSize: '0.84rem',
               cursor: 'pointer',
-              boxShadow: viewMode === 'bookshelf' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-              transition: 'all 0.15s ease',
+              textAlign: 'center',
+              transition: 'color 0.2s ease',
             }}
           >
-            <Library size={15} />
-            <span>Bookshelf View</span>
+            BookShelf
           </button>
 
           <button
+            type="button"
             onClick={() => setViewMode('grid')}
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '7px 16px',
+              position: 'relative',
+              zIndex: 1,
+              padding: '6px 16px',
               borderRadius: '9999px',
               border: 'none',
-              backgroundColor: viewMode === 'grid' ? '#ffffff' : 'transparent',
+              backgroundColor: 'transparent',
               color: viewMode === 'grid' ? '#18181b' : '#71717a',
-              fontWeight: viewMode === 'grid' ? '700' : '500',
+              fontWeight: viewMode === 'grid' ? '600' : '500',
               fontSize: '0.84rem',
               cursor: 'pointer',
-              boxShadow: viewMode === 'grid' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-              transition: 'all 0.15s ease',
+              textAlign: 'center',
+              transition: 'color 0.2s ease',
             }}
           >
-            <LayoutGrid size={15} />
-            <span>Grid View</span>
+            Grid
           </button>
         </div>
       </div>
@@ -181,6 +200,7 @@ export const MyShelfPage: React.FC = () => {
       {/* --------------------------------------------------------------------- */}
       {viewMode === 'bookshelf' && (
         <div
+          className="fade-in"
           style={{
             background: 'linear-gradient(180deg, #caa06d 0%, #b88b56 30%, #c49964 60%, #ad7f4b 100%)',
             borderLeft: '20px solid #7c5123',
@@ -515,7 +535,7 @@ export const MyShelfPage: React.FC = () => {
       {/* VIEW B: NORMAL GRID VIEW                                              */}
       {/* --------------------------------------------------------------------- */}
       {viewMode === 'grid' && (
-        <div>
+        <div className="fade-in">
           {filteredBooks.length === 0 ? (
             <div style={{ padding: '60px 0', textAlign: 'center', color: '#71717a' }}>
               <p style={{ fontSize: '1rem', fontWeight: '600', color: '#18181b', margin: '0 0 6px 0' }}>
