@@ -46,11 +46,33 @@ export const ReaderPage: React.FC = () => {
           </span>
         </div>
 
-        <div style={{ display: 'flex', gap: '16px' }}>
-          <Link to={`/book/${book.key}`} style={{ color: '#64b5f6', textDecoration: 'none', fontWeight: '500' }}>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <Link
+            to={`/book/${book.key}`}
+            style={{
+              color: '#ffffff',
+              backgroundColor: 'rgba(255, 255, 255, 0.12)',
+              padding: '6px 14px',
+              borderRadius: '9999px',
+              textDecoration: 'none',
+              fontWeight: '500',
+              fontSize: '0.84rem',
+            }}
+          >
             Book Details
           </Link>
-          <Link to="/" style={{ color: '#64b5f6', textDecoration: 'none', fontWeight: '500' }}>
+          <Link
+            to="/"
+            style={{
+              color: '#ffffff',
+              backgroundColor: 'rgba(255, 255, 255, 0.12)',
+              padding: '6px 14px',
+              borderRadius: '9999px',
+              textDecoration: 'none',
+              fontWeight: '500',
+              fontSize: '0.84rem',
+            }}
+          >
             My Shelf
           </Link>
         </div>
@@ -98,14 +120,27 @@ export const ReaderPage: React.FC = () => {
               </p>
             )}
 
-            <div style={{ marginTop: '24px', padding: '16px', border: '1px solid #333', borderRadius: '6px', textAlign: 'left' }}>
+            <div style={{ marginTop: '24px', padding: '20px', border: '1px solid #333', borderRadius: '16px', textAlign: 'left', backgroundColor: '#18181b' }}>
               <strong style={{ color: '#fff' }}>Want to test the Reader?</strong>
-              <p style={{ color: '#888', margin: '8px 0 12px 0', fontSize: '0.9rem' }}>
+              <p style={{ color: '#888', margin: '8px 0 16px 0', fontSize: '0.9rem' }}>
                 Try one of these public-domain classics with 100% full-text scans:
               </p>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 <Link to="/catalogs">
-                  <button style={{ fontSize: '0.85rem' }}>Browse Catalogs</button>
+                  <button
+                    style={{
+                      fontSize: '0.85rem',
+                      fontWeight: '600',
+                      padding: '8px 20px',
+                      borderRadius: '9999px',
+                      border: '1px solid #444',
+                      backgroundColor: '#27272a',
+                      color: '#ffffff',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Browse Catalogs
+                  </button>
                 </Link>
               </div>
             </div>
