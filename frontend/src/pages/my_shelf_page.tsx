@@ -57,9 +57,6 @@ export const MyShelfPage: React.FC = () => {
           <h1 style={{ fontSize: '1.6rem', fontWeight: '800', margin: 0, letterSpacing: '-0.3px', color: '#18181b' }}>
             My Reading Shelf
           </h1>
-          <p style={{ color: '#71717a', margin: '4px 0 0 0', fontSize: '0.9rem' }}>
-            {books.length} {books.length === 1 ? 'book' : 'books'} saved in your library
-          </p>
         </div>
 
         {/* View Mode Toggle: BookShelf vs Grid */}
