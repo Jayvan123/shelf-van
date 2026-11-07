@@ -100,8 +100,8 @@ export const HeaderPage: React.FC = () => {
                 display: 'flex',
                 alignItems: 'center',
                 backgroundColor: '#ffffff',
-                borderRadius: '8px',
-                padding: '0 14px',
+                borderRadius: '9999px',
+                padding: '0 18px',
                 height: '42px',
                 border: '1px solid #d4d4d8',
                 transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
@@ -147,8 +147,8 @@ export const HeaderPage: React.FC = () => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '5px',
-              padding: '8px 10px',
-              borderRadius: '6px',
+              padding: '8px 14px',
+              borderRadius: '9999px',
               fontSize: '0.94rem',
               fontWeight: isDiscover ? '700' : '600',
               color: isDiscover ? '#18181b' : (hoveredLink === 'discover' ? '#000000' : '#27272a'),
@@ -172,8 +172,8 @@ export const HeaderPage: React.FC = () => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '5px',
-              padding: '8px 10px',
-              borderRadius: '6px',
+              padding: '8px 14px',
+              borderRadius: '9999px',
               fontSize: '0.94rem',
               fontWeight: isCatalogs ? '700' : '600',
               color: isCatalogs ? '#18181b' : (hoveredLink === 'catalogs' ? '#000000' : '#27272a'),
@@ -230,53 +230,6 @@ export const HeaderPage: React.FC = () => {
               </span>
             )}
           </Link>
-
-          {/* Profile Avatar with Chevron (as seen in Wattpad header) */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              cursor: 'pointer',
-              padding: '4px',
-              borderRadius: '24px',
-              userSelect: 'none',
-            }}
-            title="Account"
-          >
-            <div
-              style={{
-                position: 'relative',
-                width: '34px',
-                height: '34px',
-                borderRadius: '50%',
-                backgroundColor: '#27272a',
-                color: '#ffffff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '0.82rem',
-                fontWeight: '700',
-                letterSpacing: '0.5px',
-              }}
-            >
-              <span>SV</span>
-              {/* Notification dot */}
-              <span
-                style={{
-                  position: 'absolute',
-                  top: '-1px',
-                  right: '-1px',
-                  width: '8px',
-                  height: '8px',
-                  borderRadius: '50%',
-                  backgroundColor: '#18181b',
-                  border: '1.5px solid #ffffff',
-                }}
-              />
-            </div>
-            <ChevronDown size={13} strokeWidth={2.4} color="#71717a" />
-          </div>
         </nav>
       </div>
     </header>
