@@ -67,8 +67,8 @@ export const MyShelfPage: React.FC = () => {
           style={{
             display: 'inline-flex',
             backgroundColor: '#f4f4f5',
-            padding: '3px',
-            borderRadius: '8px',
+            padding: '4px',
+            borderRadius: '9999px',
             border: '1px solid #e4e4e7',
           }}
         >
@@ -78,8 +78,8 @@ export const MyShelfPage: React.FC = () => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '6px 14px',
-              borderRadius: '6px',
+              padding: '7px 16px',
+              borderRadius: '9999px',
               border: 'none',
               backgroundColor: viewMode === 'bookshelf' ? '#ffffff' : 'transparent',
               color: viewMode === 'bookshelf' ? '#18181b' : '#71717a',
@@ -100,8 +100,8 @@ export const MyShelfPage: React.FC = () => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '6px 14px',
-              borderRadius: '6px',
+              padding: '7px 16px',
+              borderRadius: '9999px',
               border: 'none',
               backgroundColor: viewMode === 'grid' ? '#ffffff' : 'transparent',
               color: viewMode === 'grid' ? '#18181b' : '#71717a',
@@ -138,8 +138,8 @@ export const MyShelfPage: React.FC = () => {
               key={tab.id}
               onClick={() => setFilter(tab.id)}
               style={{
-                padding: '6px 14px',
-                borderRadius: '999px',
+                padding: '7px 16px',
+                borderRadius: '9999px',
                 border: isActive ? '1px solid #18181b' : '1px solid #e4e4e7',
                 backgroundColor: isActive ? '#18181b' : '#ffffff',
                 color: isActive ? '#ffffff' : '#52525b',
@@ -160,7 +160,7 @@ export const MyShelfPage: React.FC = () => {
                   minWidth: '20px',
                   height: '20px',
                   padding: '0 6px',
-                  borderRadius: '999px',
+                  borderRadius: '9999px',
                   backgroundColor: isActive ? '#27272a' : '#f4f4f5',
                   color: isActive ? '#ffffff' : '#71717a',
                   display: 'inline-flex',
@@ -187,7 +187,7 @@ export const MyShelfPage: React.FC = () => {
             borderRight: '20px solid #7c5123',
             borderTop: '16px solid #8e602f',
             borderBottom: '24px solid #6b431a',
-            borderRadius: '12px',
+            borderRadius: '24px',
             boxShadow: 'inset 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 -12px 30px rgba(0, 0, 0, 0.4), 0 16px 36px rgba(0, 0, 0, 0.25)',
             position: 'relative',
             paddingTop: '16px',
@@ -200,8 +200,8 @@ export const MyShelfPage: React.FC = () => {
                 style={{
                   display: 'inline-block',
                   backgroundColor: 'rgba(255, 255, 255, 0.92)',
-                  padding: '24px 32px',
-                  borderRadius: '10px',
+                  padding: '28px 36px',
+                  borderRadius: '20px',
                   boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
                   maxWidth: '420px',
                 }}
@@ -222,8 +222,8 @@ export const MyShelfPage: React.FC = () => {
                     color: '#ffffff',
                     fontWeight: '600',
                     fontSize: '0.88rem',
-                    padding: '8px 18px',
-                    borderRadius: '6px',
+                    padding: '10px 22px',
+                    borderRadius: '9999px',
                     textDecoration: 'none',
                   }}
                 >
@@ -380,11 +380,11 @@ export const MyShelfPage: React.FC = () => {
                             style={{
                               position: 'absolute',
                               bottom: '-84px',
-                              width: '170px',
+                              width: '176px',
                               backgroundColor: 'rgba(24, 24, 27, 0.96)',
                               color: '#ffffff',
                               padding: '10px 12px',
-                              borderRadius: '8px',
+                              borderRadius: '16px',
                               boxShadow: '0 8px 20px rgba(0,0,0,0.4)',
                               backdropFilter: 'blur(6px)',
                               zIndex: 30,
@@ -417,8 +417,8 @@ export const MyShelfPage: React.FC = () => {
                                     color: '#18181b',
                                     fontSize: '0.72rem',
                                     fontWeight: '700',
-                                    padding: '4px 6px',
-                                    borderRadius: '4px',
+                                    padding: '5px 8px',
+                                    borderRadius: '9999px',
                                     textDecoration: 'none',
                                     display: 'inline-flex',
                                     alignItems: 'center',
@@ -440,8 +440,8 @@ export const MyShelfPage: React.FC = () => {
                                   color: '#ffffff',
                                   backgroundColor: '#27272a',
                                   border: '1px solid #3f3f46',
-                                  borderRadius: '4px',
-                                  padding: '4px',
+                                  borderRadius: '9999px',
+                                  padding: '5px 8px',
                                   outline: 'none',
                                   cursor: 'pointer',
                                 }}
@@ -457,8 +457,8 @@ export const MyShelfPage: React.FC = () => {
                                   background: 'none',
                                   border: '1px solid #3f3f46',
                                   color: '#a1a1aa',
-                                  borderRadius: '4px',
-                                  padding: '4px',
+                                  borderRadius: '9999px',
+                                  padding: '5px',
                                   cursor: 'pointer',
                                   display: 'flex',
                                   alignItems: 'center',
@@ -534,12 +534,12 @@ export const MyShelfPage: React.FC = () => {
                   color: '#ffffff',
                   fontWeight: '600',
                   fontSize: '0.88rem',
-                  padding: '9px 18px',
-                  borderRadius: '6px',
+                  padding: '10px 22px',
+                  borderRadius: '9999px',
                   textDecoration: 'none',
                 }}
               >
-                Explore Catalogs &rarr;
+                Explore Catalogs
               </Link>
             </div>
           ) : (
@@ -553,8 +553,8 @@ export const MyShelfPage: React.FC = () => {
                     fontWeight: '600',
                     color: '#71717a',
                     backgroundColor: '#f4f4f5',
-                    padding: '4px 14px',
-                    borderRadius: '999px',
+                    padding: '5px 16px',
+                    borderRadius: '9999px',
                   }}
                 >
                   {filteredBooks.length} {filteredBooks.length === 1 ? 'book' : 'books'}
@@ -594,8 +594,8 @@ export const MyShelfPage: React.FC = () => {
                             color: '#18181b',
                             fontSize: '0.76rem',
                             fontWeight: '600',
-                            padding: '6px 24px 6px 10px',
-                            borderRadius: '6px',
+                            padding: '7px 28px 7px 12px',
+                            borderRadius: '9999px',
                             border: '1px solid #e4e4e7',
                             cursor: 'pointer',
                             outline: 'none',
@@ -612,7 +612,7 @@ export const MyShelfPage: React.FC = () => {
                           size={13}
                           style={{
                             position: 'absolute',
-                            right: '8px',
+                            right: '10px',
                             top: '50%',
                             transform: 'translateY(-50%)',
                             color: '#71717a',
@@ -626,10 +626,10 @@ export const MyShelfPage: React.FC = () => {
                         style={{
                           background: 'none',
                           border: 'none',
-                          borderRadius: '6px',
+                          borderRadius: '9999px',
                           color: '#a1a1aa',
                           cursor: 'pointer',
-                          padding: '6px',
+                          padding: '7px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
