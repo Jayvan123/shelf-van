@@ -258,6 +258,7 @@ export const MyShelfPage: React.FC = () => {
                 <div
                   style={{
                     display: 'flex',
+                    justifyContent: 'center',
                     alignItems: 'flex-end',
                     gap: '24px',
                     padding: '36px 32px 0 32px',
@@ -584,7 +585,7 @@ export const MyShelfPage: React.FC = () => {
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 200px))',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 200px))',
                   justifyContent: 'center',
                   gap: '28px 18px',
                 }}
