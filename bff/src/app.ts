@@ -23,6 +23,7 @@ import {
 import type { BookDetail, BookSummary, SearchResponse } from './types.js';
 
 export const app = new Hono();
+const api = new Hono();
 
 // Middlewares
 app.use('*', logger());
@@ -35,13 +36,18 @@ app.use(
   })
 );
 
+app.onError((err, c) => {
+  console.error('[BFF Error]', err);
+  return c.json({ error: err.message || 'Internal Server Error', code: 'INTERNAL_ERROR' }, 500);
+});
+
 // Health check
-app.get('/api/health', (c) => {
+api.get('/health', (c) => {
   return c.json({ status: 'ok', service: 'ShelfVan BFF', timestamp: new Date().toISOString() });
 });
 
 // GET /api/search?q={query}&page={page}&provider={all|openlibrary|googlebooks}
-app.get('/api/search', async (c) => {
+api.get('/search', async (c) => {
   const query = c.req.query('q') || '';
   const pageStr = c.req.query('page') || '1';
   const page = Math.max(1, parseInt(pageStr, 10) || 1);
@@ -143,7 +149,7 @@ app.get('/api/search', async (c) => {
 });
 
 // GET /api/subjects/:subject?page={page}
-app.get('/api/subjects/:subject', async (c) => {
+api.get('/subjects/:subject', async (c) => {
   const rawSubject = c.req.param('subject') || '';
   const cleanSubject = rawSubject.toLowerCase().trim().replace(/\s+/g, '_');
   const pageStr = c.req.query('page') || '1';
@@ -180,7 +186,7 @@ app.get('/api/subjects/:subject', async (c) => {
 });
 
 // GET /api/books/:key
-app.get('/api/books/:key', async (c) => {
+api.get('/books/:key', async (c) => {
   const rawKey = c.req.param('key');
   const cleanKey = extractCleanKey(rawKey);
 
@@ -354,7 +360,7 @@ app.get('/api/books/:key', async (c) => {
 });
 
 // GET /api/cover/:coverId?size=M
-app.get('/api/cover/:coverId', async (c) => {
+api.get('/cover/:coverId', async (c) => {
   const coverId = c.req.param('coverId');
   const sizeParam = (c.req.query('size') || 'M').toUpperCase();
   const size = ['S', 'M', 'L'].includes(sizeParam) ? sizeParam : 'M';
@@ -386,4 +392,10 @@ app.get('/api/cover/:coverId', async (c) => {
     return c.text('Failed to load cover image', 502);
   }
 });
+
+// Mount routes on both /api (when called with /api prefix) and root / (if prefix stripped by reverse proxy)
+app.route('/api', api);
+app.route('/', api);
+
+export default app;
 
