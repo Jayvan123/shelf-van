@@ -116,14 +116,14 @@ export const Top10Row: React.FC<Top10RowProps> = ({
 
       {/* Carousel Track with Floating Navigation Buttons */}
       <div style={{ position: 'relative' }}>
-        {/* Left Arrow Button (vertically centered on the covers) */}
+        {/* Left Arrow Button (vertically centered on the 208px covers) */}
         {canScrollLeft && (
           <button
             onClick={() => scroll('left')}
             style={{
               position: 'absolute',
               left: '-16px',
-              top: '50%',
+              top: '104px',
               transform: 'translateY(-50%)',
               zIndex: 30,
               width: '38px',
@@ -153,14 +153,14 @@ export const Top10Row: React.FC<Top10RowProps> = ({
           </button>
         )}
 
-        {/* Right Arrow Button (vertically centered on the covers) */}
+        {/* Right Arrow Button (vertically centered on the 208px covers) */}
         {canScrollRight && (
           <button
             onClick={() => scroll('right')}
             style={{
               position: 'absolute',
               right: '-16px',
-              top: '50%',
+              top: '104px',
               transform: 'translateY(-50%)',
               zIndex: 30,
               width: '38px',
@@ -199,7 +199,7 @@ export const Top10Row: React.FC<Top10RowProps> = ({
             gap: '16px',
             alignItems: 'flex-start',
             overflowX: 'auto',
-            padding: '8px 2px 18px 2px',
+            padding: '6px 2px 18px 2px',
             scrollSnapType: 'x mandatory',
             WebkitOverflowScrolling: 'touch',
           }}
@@ -218,28 +218,32 @@ export const Top10Row: React.FC<Top10RowProps> = ({
                 style={{
                   flex: '0 0 138px',
                   width: '138px',
+                  height: '218px',
+                  minHeight: '218px',
+                  maxHeight: '218px',
                   display: 'flex',
                   flexDirection: 'column',
                   scrollSnapAlign: 'start',
                 }}
               >
-                {/* Book Cover Container with Overlapping Number */}
+                {/* Book Cover Container with Fixed Identical Dimensions */}
                 <Link
                   to={`/book/${book.key}`}
                   style={{
                     position: 'relative',
                     display: 'block',
-                    width: '100%',
-                    aspectRatio: '1 / 1.5',
+                    width: '138px',
+                    height: '208px',
+                    minHeight: '208px',
+                    maxHeight: '208px',
                     textDecoration: 'none',
-                    marginBottom: '10px',
                   }}
                   title={`${index + 1}. ${book.title} by ${book.author}`}
                 >
                   <div
                     style={{
-                      width: '100%',
-                      height: '100%',
+                      width: '138px',
+                      height: '208px',
                       borderRadius: '10px',
                       overflow: 'hidden',
                       backgroundColor: '#27272a',
