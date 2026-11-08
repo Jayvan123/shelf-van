@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BookOpen } from 'lucide-react';
 import { useSubjectBooks } from '../api/hooks.ts';
+import { resolveCoverUrl } from '../api/client.ts';
 
 const CURATED_FEATURED = [
   { key: 'OL45804W', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', coverId: 12345 },
@@ -153,10 +154,7 @@ export const FeaturedBanner: React.FC = () => {
         className="hide-scrollbar"
       >
         {bannerBooks.map((book, index) => {
-          const coverSrc =
-            'coverUrl' in book && book.coverUrl
-              ? (book.coverUrl.startsWith('http') ? book.coverUrl : `http://localhost:3000${book.coverUrl}`)
-              : undefined;
+          const coverSrc = 'coverUrl' in book ? resolveCoverUrl(book.coverUrl) : undefined;
 
           return (
             <Link

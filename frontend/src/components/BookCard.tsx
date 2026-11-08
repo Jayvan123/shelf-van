@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Book, Bookmark, Check, Eye } from 'lucide-react';
 import type { BookSummary, ReadingStatus } from '../types/index.ts';
 import { useShelfStore } from '../store/useShelfStore.ts';
+import { resolveCoverUrl } from '../api/client.ts';
 
 interface BookCardProps {
   book: BookSummary;
@@ -15,9 +16,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onQuickAdd, footer }) 
   const shelfEntry = getBook(book.key);
   const [isHovered, setIsHovered] = useState(false);
 
-  const coverSrc = book.coverUrl
-    ? (book.coverUrl.startsWith('http') ? book.coverUrl : `http://localhost:3000${book.coverUrl}`)
-    : undefined;
+  const coverSrc = resolveCoverUrl(book.coverUrl);
 
   const handleAdd = (e: React.MouseEvent, status: ReadingStatus) => {
     e.preventDefault();

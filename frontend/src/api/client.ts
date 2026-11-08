@@ -1,6 +1,13 @@
 import type { BookDetail, SearchResponse } from '../types/index.ts';
 
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = import.meta.env.VITE_API_BASE || '/api';
+
+export function resolveCoverUrl(url?: string): string | undefined {
+  if (!url) return undefined;
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  const baseUrl = import.meta.env.VITE_API_URL || '';
+  return `${baseUrl}${url}`;
+}
 
 export class ApiError extends Error {
   status: number;

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useBookDetail, useSubjectBooks } from '../api/hooks.ts';
 import { useShelfStore } from '../store/useShelfStore.ts';
+import { resolveCoverUrl } from '../api/client.ts';
 import type { ReadingStatus } from '../types/index.ts';
 
 interface RecItem {
@@ -182,9 +183,7 @@ export const BookDetailPage: React.FC = () => {
     );
   }
 
-  const coverSrc = book.coverUrl
-    ? (book.coverUrl.startsWith('http') ? book.coverUrl : `http://localhost:3000${book.coverUrl}`)
-    : undefined;
+  const coverSrc = resolveCoverUrl(book.coverUrl);
 
   const stats = getDeterministicStats(book.key, book.pageCount);
   const primaryAuthor = book.authors[0] || 'Unknown Author';
@@ -772,9 +771,7 @@ export const BookDetailPage: React.FC = () => {
             className="hide-scrollbar"
           >
             {recommendations.map((item) => {
-              const itemCover = item.coverUrl
-                ? (item.coverUrl.startsWith('http') ? item.coverUrl : `http://localhost:3000${item.coverUrl}`)
-                : undefined;
+              const itemCover = resolveCoverUrl(item.coverUrl);
 
               return (
                 <Link

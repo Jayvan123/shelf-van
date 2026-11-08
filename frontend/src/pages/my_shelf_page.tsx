@@ -4,6 +4,7 @@ import { Trash2, Eye, BookOpen, ChevronDown, HardDrive } from 'lucide-react';
 import { useShelfStore } from '../store/useShelfStore.ts';
 import { BookCard } from '../components/BookCard.tsx';
 import { StorageBackupModal } from '../components/StorageBackupModal.tsx';
+import { resolveCoverUrl } from '../api/client.ts';
 import type { ReadingStatus, ShelfBook } from '../types/index.ts';
 
 const STATUS_TABS: Array<{ id: ReadingStatus | 'all'; label: string }> = [
@@ -301,9 +302,7 @@ export const MyShelfPage: React.FC = () => {
                   className="hide-scrollbar"
                 >
                   {shelf.map((book) => {
-                    const coverSrc = book.coverUrl
-                      ? (book.coverUrl.startsWith('http') ? book.coverUrl : `http://localhost:3000${book.coverUrl}`)
-                      : undefined;
+                    const coverSrc = resolveCoverUrl(book.coverUrl);
                     const isHovered = hoveredKey === book.key;
 
                     return (

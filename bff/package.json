@@ -1,12 +1,12 @@
 {
   "name": "bff",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "dist/bff/src/index.js",
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "tsx src/index.ts"
+    "start": "node dist/bff/src/index.js"
   },
   "keywords": [],
   "author": "",

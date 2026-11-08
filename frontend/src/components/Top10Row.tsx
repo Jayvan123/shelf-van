@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSubjectBooks } from '../api/hooks.ts';
+import { resolveCoverUrl } from '../api/client.ts';
 import type { BookSummary } from '../types/index.ts';
 
 interface Top10Book {
@@ -206,11 +207,8 @@ export const Top10Row: React.FC<Top10RowProps> = ({
           className="hide-scrollbar"
         >
           {top10Books.map((book, index) => {
-            const coverSrc = book.coverUrl
-              ? (book.coverUrl.startsWith('http') ? book.coverUrl : `http://localhost:3000${book.coverUrl}`)
-              : book.coverId
-              ? `https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg`
-              : undefined;
+            const coverSrc = resolveCoverUrl(book.coverUrl)
+              || (book.coverId ? `https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg` : undefined);
 
             return (
               <div
