@@ -21,6 +21,17 @@ const AppLayout: React.FC = () => {
   const location = useLocation();
   const isReaderPage = location.pathname.startsWith('/read/');
 
+  // Automatically request Chrome / browser persistent storage on startup
+  React.useEffect(() => {
+    if (typeof navigator !== 'undefined' && navigator.storage && navigator.storage.persist) {
+      navigator.storage.persisted().then((isPersisted) => {
+        if (!isPersisted) {
+          navigator.storage.persist().catch(() => {});
+        }
+      }).catch(() => {});
+    }
+  }, []);
+
   return (
     <div>
       {!isReaderPage && <HeaderPage />}

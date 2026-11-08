@@ -8,6 +8,8 @@ interface ShelfState {
   removeBook: (key: string) => void;
   updateStatus: (key: string, status: ReadingStatus) => void;
   getBook: (key: string) => ShelfBook | undefined;
+  importBooks: (newBooks: ShelfBook[]) => number;
+  clearShelf: () => void;
 }
 
 export const useShelfStore = create<ShelfState>()(
@@ -54,6 +56,30 @@ export const useShelfStore = create<ShelfState>()(
 
       getBook: (key) => {
         return get().books.find((b) => b.key === key);
+      },
+
+      importBooks: (newBooks) => {
+        let count = 0;
+        set((state) => {
+          const map = new Map<string, ShelfBook>();
+          state.books.forEach((b) => map.set(b.key, b));
+          newBooks.forEach((b) => {
+            if (b && b.key && b.title) {
+              if (!map.has(b.key)) count++;
+              map.set(b.key, {
+                ...b,
+                status: b.status || 'want_to_read',
+                addedAt: b.addedAt || new Date().toISOString(),
+              });
+            }
+          });
+          return { books: Array.from(map.values()) };
+        });
+        return count;
+      },
+
+      clearShelf: () => {
+        set({ books: [] });
       },
     }),
     {

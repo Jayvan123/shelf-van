@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Trash2, Eye, BookOpen, ChevronDown } from 'lucide-react';
+import { Trash2, Eye, BookOpen, ChevronDown, HardDrive } from 'lucide-react';
 import { useShelfStore } from '../store/useShelfStore.ts';
 import { BookCard } from '../components/BookCard.tsx';
+import { StorageBackupModal } from '../components/StorageBackupModal.tsx';
 import type { ReadingStatus, ShelfBook } from '../types/index.ts';
 
 const STATUS_TABS: Array<{ id: ReadingStatus | 'all'; label: string }> = [
@@ -19,6 +20,7 @@ export const MyShelfPage: React.FC = () => {
   const [filter, setFilter] = useState<ReadingStatus | 'all'>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'bookshelf'>('bookshelf');
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
+  const [isBackupOpen, setIsBackupOpen] = useState(false);
 
   const filteredBooks = books.filter((b) => {
     if (filter === 'all') return true;
@@ -59,78 +61,112 @@ export const MyShelfPage: React.FC = () => {
           </h1>
         </div>
 
-        {/* View Mode Toggle: BookShelf vs Grid */}
-        <div
-          style={{
-            position: 'relative',
-            display: 'inline-grid',
-            gridTemplateColumns: '1fr 1fr',
-            backgroundColor: '#f4f4f5',
-            padding: '3px',
-            borderRadius: '9999px',
-            border: '1px solid #e4e4e7',
-            userSelect: 'none',
-            minWidth: '180px',
-          }}
-        >
-          {/* Smooth sliding pill indicator */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          {/* Chrome Storage & Backup Button */}
+          <button
+            onClick={() => setIsBackupOpen(true)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '7px 16px',
+              borderRadius: '9999px',
+              border: '1px solid #e4e4e7',
+              backgroundColor: '#ffffff',
+              color: '#27272a',
+              fontSize: '0.84rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+            }}
+            title="Manage Chrome local storage and export/restore backup"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#d4d4d8';
+              e.currentTarget.style.backgroundColor = '#f4f4f5';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = '#e4e4e7';
+              e.currentTarget.style.backgroundColor = '#ffffff';
+            }}
+          >
+            <HardDrive size={15} />
+            <span>Storage & Backup</span>
+          </button>
+
+          {/* View Mode Toggle: BookShelf vs Grid */}
           <div
             style={{
-              position: 'absolute',
-              top: '3px',
-              bottom: '3px',
-              left: '3px',
-              width: 'calc(50% - 3px)',
-              backgroundColor: '#ffffff',
-              borderRadius: '9999px',
-              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)',
-              transform: viewMode === 'bookshelf' ? 'translateX(0)' : 'translateX(100%)',
-              transition: 'transform 0.25s cubic-bezier(0.2, 0, 0, 1)',
-              pointerEvents: 'none',
-            }}
-          />
-
-          <button
-            type="button"
-            onClick={() => setViewMode('bookshelf')}
-            style={{
               position: 'relative',
-              zIndex: 1,
-              padding: '6px 16px',
+              display: 'inline-grid',
+              gridTemplateColumns: '1fr 1fr',
+              backgroundColor: '#f4f4f5',
+              padding: '3px',
               borderRadius: '9999px',
-              border: 'none',
-              backgroundColor: 'transparent',
-              color: viewMode === 'bookshelf' ? '#18181b' : '#71717a',
-              fontWeight: viewMode === 'bookshelf' ? '600' : '500',
-              fontSize: '0.84rem',
-              cursor: 'pointer',
-              textAlign: 'center',
-              transition: 'color 0.2s ease',
+              border: '1px solid #e4e4e7',
+              userSelect: 'none',
+              minWidth: '180px',
             }}
           >
-            BookShelf
-          </button>
+            {/* Smooth sliding pill indicator */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '3px',
+                bottom: '3px',
+                left: '3px',
+                width: 'calc(50% - 3px)',
+                backgroundColor: '#ffffff',
+                borderRadius: '9999px',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)',
+                transform: viewMode === 'bookshelf' ? 'translateX(0)' : 'translateX(100%)',
+                transition: 'transform 0.25s cubic-bezier(0.2, 0, 0, 1)',
+                pointerEvents: 'none',
+              }}
+            />
 
-          <button
-            type="button"
-            onClick={() => setViewMode('grid')}
-            style={{
-              position: 'relative',
-              zIndex: 1,
-              padding: '6px 16px',
-              borderRadius: '9999px',
-              border: 'none',
-              backgroundColor: 'transparent',
-              color: viewMode === 'grid' ? '#18181b' : '#71717a',
-              fontWeight: viewMode === 'grid' ? '600' : '500',
-              fontSize: '0.84rem',
-              cursor: 'pointer',
-              textAlign: 'center',
-              transition: 'color 0.2s ease',
-            }}
-          >
-            Grid
-          </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('bookshelf')}
+              style={{
+                position: 'relative',
+                zIndex: 1,
+                padding: '6px 16px',
+                borderRadius: '9999px',
+                border: 'none',
+                backgroundColor: 'transparent',
+                color: viewMode === 'bookshelf' ? '#18181b' : '#71717a',
+                fontWeight: viewMode === 'bookshelf' ? '600' : '500',
+                fontSize: '0.84rem',
+                cursor: 'pointer',
+                textAlign: 'center',
+                transition: 'color 0.2s ease',
+              }}
+            >
+              BookShelf
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setViewMode('grid')}
+              style={{
+                position: 'relative',
+                zIndex: 1,
+                padding: '6px 16px',
+                borderRadius: '9999px',
+                border: 'none',
+                backgroundColor: 'transparent',
+                color: viewMode === 'grid' ? '#18181b' : '#71717a',
+                fontWeight: viewMode === 'grid' ? '600' : '500',
+                fontSize: '0.84rem',
+                cursor: 'pointer',
+                textAlign: 'center',
+                transition: 'color 0.2s ease',
+              }}
+            >
+              Grid
+            </button>
+          </div>
         </div>
       </div>
 
@@ -675,6 +711,12 @@ export const MyShelfPage: React.FC = () => {
           )}
         </div>
       )}
+
+      {/* Chrome Storage & Library Backup Modal */}
+      <StorageBackupModal
+        isOpen={isBackupOpen}
+        onClose={() => setIsBackupOpen(false)}
+      />
     </div>
   );
 };
