@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, ExternalLink, RotateCcw, BookOpen } from 'lucide-react';
+import { ArrowLeft, ExternalLink, RotateCcw, BookOpen, Maximize2, Minimize2 } from 'lucide-react';
 import { useBookDetail } from '../api/hooks.ts';
 
 export const ReaderPage: React.FC = () => {
@@ -8,6 +8,23 @@ export const ReaderPage: React.FC = () => {
   const { data: book, isLoading, isError, error } = useBookDetail(key);
   const [viewMode, setViewMode] = useState<'2up' | '1up'>('2up');
   const [reloadKey, setReloadKey] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleFsChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+    document.addEventListener('fullscreenchange', handleFsChange);
+    return () => document.removeEventListener('fullscreenchange', handleFsChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  };
 
   if (isLoading) {
     return (
@@ -200,8 +217,29 @@ export const ReaderPage: React.FC = () => {
           </div>
         )}
 
-        {/* Right: Unlock / External Readers */}
+        {/* Right: Fullscreen & External Readers */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button
+            onClick={toggleFullscreen}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+              backgroundColor: '#27272a',
+              color: '#d4d4d8',
+              padding: '6px 12px',
+              borderRadius: '8px',
+              border: '1px solid #3f3f46',
+              fontSize: '0.8rem',
+              fontWeight: '500',
+              cursor: 'pointer',
+            }}
+            title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+          >
+            {isFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+            <span className="hidden sm:inline">{isFullscreen ? 'Exit' : 'Fullscreen'}</span>
+          </button>
+
           {archiveDetailsUrl && (
             <a
               href={archiveDetailsUrl}
