@@ -121,9 +121,10 @@ export const Top10Row: React.FC<Top10RowProps> = ({
         {canScrollLeft && (
           <button
             onClick={() => scroll('left')}
+            className="hidden md:flex"
             style={{
               position: 'absolute',
-              left: '-16px',
+              left: '-12px',
               top: '104px',
               transform: 'translateY(-50%)',
               zIndex: 30,
@@ -135,7 +136,6 @@ export const Top10Row: React.FC<Top10RowProps> = ({
               color: '#18181b',
               boxShadow: '0 4px 14px rgba(0, 0, 0, 0.15)',
               cursor: 'pointer',
-              display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               transition: 'transform 0.15s ease, background-color 0.15s ease',
@@ -158,9 +158,10 @@ export const Top10Row: React.FC<Top10RowProps> = ({
         {canScrollRight && (
           <button
             onClick={() => scroll('right')}
+            className="hidden md:flex"
             style={{
               position: 'absolute',
-              right: '-16px',
+              right: '-12px',
               top: '104px',
               transform: 'translateY(-50%)',
               zIndex: 30,
@@ -172,7 +173,6 @@ export const Top10Row: React.FC<Top10RowProps> = ({
               color: '#18181b',
               boxShadow: '0 4px 14px rgba(0, 0, 0, 0.15)',
               cursor: 'pointer',
-              display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               transition: 'transform 0.15s ease, background-color 0.15s ease',
@@ -300,15 +300,15 @@ export const Top10Row: React.FC<Top10RowProps> = ({
                     style={{
                       position: 'absolute',
                       bottom: '-10px',
-                      left: '4px',
-                      fontSize: '2.5rem',
+                      left: '2px',
+                      fontSize: '2.8rem',
                       fontWeight: '900',
                       lineHeight: '1',
                       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                      color: '#111827',
-                      WebkitTextStroke: '2px #ffffff',
+                      color: '#ffffff',
+                      WebkitTextStroke: '2.5px #18181b',
                       paintOrder: 'stroke fill',
-                      filter: 'drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3))',
+                      filter: 'drop-shadow(0 3px 6px rgba(0, 0, 0, 0.45))',
                       zIndex: 10,
                       userSelect: 'none',
                       pointerEvents: 'none',
