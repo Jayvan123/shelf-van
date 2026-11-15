@@ -251,9 +251,10 @@ export const TrendingMosaicRow: React.FC = () => {
         {canScrollLeft && (
           <button
             onClick={() => scroll('left')}
+            className="hidden md:flex"
             style={{
               position: 'absolute',
-              left: '-16px',
+              left: '-12px',
               top: '50%',
               transform: 'translateY(-50%)',
               zIndex: 30,
@@ -265,7 +266,6 @@ export const TrendingMosaicRow: React.FC = () => {
               color: '#18181b',
               boxShadow: '0 4px 14px rgba(0, 0, 0, 0.15)',
               cursor: 'pointer',
-              display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               transition: 'transform 0.15s ease, background-color 0.15s ease',
@@ -288,9 +288,10 @@ export const TrendingMosaicRow: React.FC = () => {
         {canScrollRight && (
           <button
             onClick={() => scroll('right')}
+            className="hidden md:flex"
             style={{
               position: 'absolute',
-              right: '-16px',
+              right: '-12px',
               top: '50%',
               transform: 'translateY(-50%)',
               zIndex: 30,
@@ -302,7 +303,6 @@ export const TrendingMosaicRow: React.FC = () => {
               color: '#18181b',
               boxShadow: '0 4px 14px rgba(0, 0, 0, 0.15)',
               cursor: 'pointer',
-              display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               transition: 'transform 0.15s ease, background-color 0.15s ease',
