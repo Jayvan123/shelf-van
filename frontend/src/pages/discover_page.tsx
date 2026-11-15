@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useBookSearch } from '../api/hooks.ts';
 import { BookCard } from '../components/BookCard.tsx';
@@ -26,10 +26,15 @@ export const DiscoverPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [provider, setProvider] = useState<'all' | 'googlebooks' | 'openlibrary'>('all');
 
-  // Reset page to 1 when query or provider changes
-  useEffect(() => {
+  const [prevQuery, setPrevQuery] = useState(queryParam);
+  const [prevProvider, setPrevProvider] = useState(provider);
+
+  // Reset page to 1 when query or provider changes without useEffect cascading setState
+  if (queryParam !== prevQuery || provider !== prevProvider) {
+    setPrevQuery(queryParam);
+    setPrevProvider(provider);
     setPage(1);
-  }, [queryParam, provider]);
+  }
 
   const { data: searchData, isLoading: isSearchLoading, isError: isSearchError, error: searchError, isFetching } = useBookSearch(
     queryParam,
@@ -94,8 +99,33 @@ export const DiscoverPage: React.FC = () => {
           )}
 
           {isSearchLoading ? (
-            <div style={{ padding: '60px 0', textAlign: 'center', color: '#71717a' }}>
-              <p>Fetching books...</p>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+                gap: '28px 18px',
+              }}
+            >
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                <div key={n} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div
+                    className="skeleton-shimmer"
+                    style={{
+                      width: '100%',
+                      aspectRatio: '1 / 1.48',
+                      borderRadius: '8px',
+                    }}
+                  />
+                  <div
+                    className="skeleton-shimmer"
+                    style={{ width: '85%', height: '14px', borderRadius: '4px', marginTop: '4px' }}
+                  />
+                  <div
+                    className="skeleton-shimmer"
+                    style={{ width: '55%', height: '12px', borderRadius: '4px' }}
+                  />
+                </div>
+              ))}
             </div>
           ) : searchData && searchData.books.length > 0 ? (
             <div>
