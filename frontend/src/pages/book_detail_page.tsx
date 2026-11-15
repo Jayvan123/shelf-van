@@ -3,12 +3,13 @@ import { useParams, Link } from 'react-router-dom';
 import {
   Check,
   Plus,
-  Eye,
-  Star,
-  List,
   ChevronRight,
   BookOpen,
   ExternalLink,
+  Calendar,
+  BookText,
+  Building2,
+  List,
 } from 'lucide-react';
 import { useBookDetail, useSubjectBooks } from '../api/hooks.ts';
 import { useShelfStore } from '../store/useShelfStore.ts';
@@ -164,8 +165,19 @@ export const BookDetailPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '60px 20px', textAlign: 'center', color: '#71717a' }}>
-        <p style={{ fontSize: '1rem' }}>Loading book details...</p>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 20px 80px 20px' }}>
+        <div style={{ display: 'flex', gap: '32px', alignItems: 'flex-start', flexWrap: 'wrap', marginBottom: '40px' }}>
+          <div
+            className="skeleton-shimmer"
+            style={{ width: '190px', height: '275px', borderRadius: '16px', flexShrink: 0 }}
+          />
+          <div style={{ flex: 1, minWidth: '280px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div className="skeleton-shimmer" style={{ width: '60%', height: '36px', borderRadius: '8px' }} />
+            <div className="skeleton-shimmer" style={{ width: '30%', height: '22px', borderRadius: '6px' }} />
+            <div className="skeleton-shimmer" style={{ width: '45%', height: '18px', borderRadius: '6px', marginTop: '10px' }} />
+            <div className="skeleton-shimmer" style={{ width: '160px', height: '44px', borderRadius: '999px', marginTop: '14px' }} />
+          </div>
+        </div>
       </div>
     );
   }
@@ -209,7 +221,11 @@ export const BookDetailPage: React.FC = () => {
     }
   };
 
-  const descriptionText = book.description || 'No detailed synopsis available for this title yet. Read or preview this book using the links above.';
+  const rawDesc = book.description || 'No detailed synopsis available for this title yet. Read or preview this book using the links above.';
+  const descriptionText = rawDesc
+    .replace(/-{5,}/g, '')
+    .replace(/\[\d+\]:.*$/gm, '')
+    .trim();
   const shouldTruncate = descriptionText.length > 220;
 
   return (
@@ -295,7 +311,7 @@ export const BookDetailPage: React.FC = () => {
             </span>
           </div>
 
-          {/* Stats Bar (Views • Stars • Parts) */}
+          {/* Metadata Stats Bar (Pages • Published Year • Publisher) */}
           <div
             style={{
               display: 'flex',
@@ -304,23 +320,30 @@ export const BookDetailPage: React.FC = () => {
               fontSize: '0.86rem',
               color: '#52525b',
               marginBottom: '28px',
+              flexWrap: 'wrap',
             }}
           >
             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Eye size={15} style={{ color: '#71717a' }} />
-              <strong style={{ color: '#18181b', fontWeight: '600' }}>{stats.views}</strong>
+              <BookText size={15} style={{ color: '#71717a' }} />
+              <strong style={{ color: '#18181b', fontWeight: '600' }}>
+                {book.pageCount ? `${book.pageCount} pages` : 'Digital Scan'}
+              </strong>
             </span>
             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Star size={15} style={{ color: '#71717a' }} />
-              <strong style={{ color: '#18181b', fontWeight: '600' }}>{stats.rating}</strong>
+              <Calendar size={15} style={{ color: '#71717a' }} />
+              <strong style={{ color: '#18181b', fontWeight: '600' }}>
+                {book.firstPublishYear || book.publishDate || 'Public Domain'}
+              </strong>
             </span>
             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <List size={15} style={{ color: '#71717a' }} />
-              <strong style={{ color: '#18181b', fontWeight: '600' }}>{stats.parts}</strong>
+              <Building2 size={15} style={{ color: '#71717a' }} />
+              <strong style={{ color: '#18181b', fontWeight: '600' }}>
+                {book.publishers?.[0] || (book.provider === 'googlebooks' ? 'Google Books' : 'Open Library Archive')}
+              </strong>
             </span>
           </div>
 
-          {/* Action Row: [Start reading]  (+) */}
+          {/* Action Row: [Start reading / Find Book]  (+) */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', position: 'relative' }}>
             {book.isReadable || book.readerUrl ? (
               <Link
@@ -352,7 +375,7 @@ export const BookDetailPage: React.FC = () => {
                   color: '#ffffff',
                   fontSize: '0.92rem',
                   fontWeight: '700',
-                  padding: '12px 36px',
+                  padding: '12px 32px',
                   borderRadius: '999px',
                   textDecoration: 'none',
                   display: 'inline-flex',
@@ -362,25 +385,32 @@ export const BookDetailPage: React.FC = () => {
                   boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                 }}
               >
-                Start reading
+                <span>Preview Book</span>
                 <ExternalLink size={14} />
               </a>
             ) : (
-              <button
-                disabled
+              <a
+                href={`https://www.gutenberg.org/ebooks/search/?query=${encodeURIComponent(book.title)}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 style={{
-                  backgroundColor: '#e4e4e7',
-                  color: '#a1a1aa',
+                  backgroundColor: '#18181b',
+                  color: '#ffffff',
                   fontSize: '0.92rem',
                   fontWeight: '700',
-                  padding: '12px 36px',
+                  padding: '12px 28px',
                   borderRadius: '999px',
-                  border: 'none',
-                  cursor: 'not-allowed',
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                 }}
               >
-                Start reading
-              </button>
+                <span>Find on Gutenberg</span>
+                <ExternalLink size={14} />
+              </a>
             )}
 
             {/* Quick Add (+) Circle Button */}
