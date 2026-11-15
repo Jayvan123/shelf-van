@@ -5,11 +5,18 @@ import { useSubjectBooks } from '../api/hooks.ts';
 import { resolveCoverUrl } from '../api/client.ts';
 
 const CURATED_FEATURED = [
-  { key: 'OL45804W', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', coverId: 12345 },
-  { key: 'OL12345W', title: "Alice's Adventures in Wonderland", author: 'Lewis Carroll', coverId: 67890 },
-  { key: 'OL66554W', title: 'Pride and Prejudice', author: 'Jane Austen', coverId: 11223 },
+  { key: 'OL45804W', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', coverId: 8432047 },
+  { key: 'OL12345W', title: "Alice's Adventures in Wonderland", author: 'Lewis Carroll', coverId: 8228691 },
+  { key: 'OL66554W', title: 'Pride and Prejudice', author: 'Jane Austen', coverId: 8231856 },
   { key: 'OL450063W', title: 'Frankenstein', author: 'Mary Shelley', coverId: 44556 },
   { key: 'OL262423W', title: 'The Adventures of Sherlock Holmes', author: 'Arthur Conan Doyle', coverId: 77889 },
+];
+
+const RANDOM_POOL = [
+  'OL45804W', 'OL12345W', 'OL66554W', 'OL450063W', 'OL262423W',
+  'OL7222246M', 'OL10521270M', 'OL9259256M', 'OL8406786M', 'OL12645114M',
+  'OL8231850M', 'OL8235114M', 'OL8231852M', 'OL8231858M', 'OL8240110M',
+  'OL8231874M', 'OL8231860M', 'OL8235275M', 'OL8231862M', 'OL8235222M',
 ];
 
 export const FeaturedBanner: React.FC = () => {
@@ -20,12 +27,13 @@ export const FeaturedBanner: React.FC = () => {
   const bannerBooks = data && data.books.length > 0 ? data.books.slice(0, 5) : CURATED_FEATURED;
 
   const handleRandomPick = () => {
-    if (bannerBooks.length > 0) {
-      const randomIndex = Math.floor(Math.random() * bannerBooks.length);
-      const chosen = bannerBooks[randomIndex];
-      if (chosen) {
-        navigate(`/book/${chosen.key}`);
-      }
+    // Pick from all available books
+    const availableKeys = data && data.books.length > 0
+      ? [...data.books.map((b) => b.key), ...RANDOM_POOL]
+      : RANDOM_POOL;
+    const randomKey = availableKeys[Math.floor(Math.random() * availableKeys.length)];
+    if (randomKey) {
+      navigate(`/book/${randomKey}`);
     }
   };
 
