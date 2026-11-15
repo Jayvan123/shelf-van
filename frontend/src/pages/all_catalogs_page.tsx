@@ -106,8 +106,33 @@ export const AllCatalogsPage: React.FC = () => {
         )}
 
         {isGenreLoading ? (
-          <div style={{ padding: '60px 0', textAlign: 'center', color: '#71717a' }}>
-            <p>Loading books in {genreTitle}...</p>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+              gap: '28px 18px',
+            }}
+          >
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+              <div key={n} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div
+                  className="skeleton-shimmer"
+                  style={{
+                    width: '100%',
+                    aspectRatio: '1 / 1.48',
+                    borderRadius: '8px',
+                  }}
+                />
+                <div
+                  className="skeleton-shimmer"
+                  style={{ width: '85%', height: '14px', borderRadius: '4px', marginTop: '4px' }}
+                />
+                <div
+                  className="skeleton-shimmer"
+                  style={{ width: '55%', height: '12px', borderRadius: '4px' }}
+                />
+              </div>
+            ))}
           </div>
         ) : genreBooks && genreBooks.books.length > 0 ? (
           <div>
