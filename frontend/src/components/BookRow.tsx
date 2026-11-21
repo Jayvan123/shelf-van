@@ -113,7 +113,7 @@ export const BookRow: React.FC<BookRowProps> = ({ title, subject }) => {
             onClick={scrollLeft}
             aria-label="Previous books"
             style={navButtonStyle('left')}
-            className="hidden md:flex"
+            className="show-md-flex"
             onMouseEnter={(e) => {
               (e.currentTarget as HTMLElement).style.transform = 'translateY(-50%) scale(1.08)';
             }}
@@ -131,7 +131,7 @@ export const BookRow: React.FC<BookRowProps> = ({ title, subject }) => {
             onClick={scrollRight}
             aria-label="Next books"
             style={navButtonStyle('right')}
-            className="hidden md:flex"
+            className="show-md-flex"
             onMouseEnter={(e) => {
               (e.currentTarget as HTMLElement).style.transform = 'translateY(-50%) scale(1.08)';
             }}
