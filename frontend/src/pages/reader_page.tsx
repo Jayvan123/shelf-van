@@ -52,7 +52,7 @@ export const ReaderPage: React.FC = () => {
         <p style={{ color: '#ef4444', fontWeight: '600', marginBottom: '16px' }}>
           {error instanceof Error ? error.message : 'Failed to load reader.'}
         </p>
-        <Link to="/" style={{ color: '#2563eb', textDecoration: 'none', fontWeight: '600' }}>
+        <Link to="/shelf" style={{ color: '#2563eb', textDecoration: 'none', fontWeight: '600' }}>
           &larr; Back to My Shelf
         </Link>
       </div>
@@ -237,7 +237,7 @@ export const ReaderPage: React.FC = () => {
             title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
           >
             {isFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
-            <span className="hidden sm:inline">{isFullscreen ? 'Exit' : 'Fullscreen'}</span>
+            <span className="show-sm-inline">{isFullscreen ? 'Exit' : 'Fullscreen'}</span>
           </button>
 
           {archiveDetailsUrl && (
@@ -289,9 +289,9 @@ export const ReaderPage: React.FC = () => {
           </a>
 
           <Link
-            to="/"
+            to="/shelf"
             style={{
-              color: '#a1a1aa',
+              color: '#d4d4d8',
               padding: '6px 10px',
               textDecoration: 'none',
               fontWeight: '500',
