@@ -126,9 +126,11 @@ export const HeaderPage: React.FC = () => {
               width: '100%',
               maxWidth: '380px',
             }}
-            className="hidden sm:block"
+            className="show-sm-block"
+            role="search"
           >
             <div
+              className="pill-field"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -142,7 +144,8 @@ export const HeaderPage: React.FC = () => {
             >
               <SearchIcon size={16} color="#71717a" style={{ marginRight: '10px', flexShrink: 0 }} />
               <input
-                type="text"
+                type="search"
+                aria-label="Search books, authors or ISBN"
                 placeholder="Search books, authors, ISBN..."
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
@@ -171,13 +174,13 @@ export const HeaderPage: React.FC = () => {
 
         {/* Desktop Nav */}
         <nav
+          aria-label="Primary"
           style={{
-            display: 'flex',
             alignItems: 'center',
             gap: '12px',
             flexShrink: 0,
           }}
-          className="hidden md:flex"
+          className="show-md-flex"
         >
           {/* Books / Discover */}
           <Link
@@ -362,7 +365,7 @@ export const HeaderPage: React.FC = () => {
         </nav>
 
         {/* Mobile Hamburger Button */}
-        <div className="flex md:hidden items-center gap-2">
+        <div className="header-mobile-actions hide-md">
           <Link
             to="/shelf"
             style={{
@@ -395,6 +398,8 @@ export const HeaderPage: React.FC = () => {
               justifyContent: 'center',
             }}
             aria-label="Toggle menu"
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-menu"
           >
             {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
@@ -412,11 +417,13 @@ export const HeaderPage: React.FC = () => {
             flexDirection: 'column',
             gap: '12px',
           }}
-          className="md:hidden fade-in"
+          id="mobile-menu"
+          className="hide-md fade-in"
         >
           {/* Mobile Search input */}
           <form onSubmit={handleSearchSubmit} style={{ width: '100%' }}>
             <div
+              className="pill-field"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -429,7 +436,8 @@ export const HeaderPage: React.FC = () => {
             >
               <SearchIcon size={16} color="#71717a" style={{ marginRight: '8px' }} />
               <input
-                type="text"
+                type="search"
+                aria-label="Search books or authors"
                 placeholder="Search books, authors..."
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
@@ -443,7 +451,7 @@ export const HeaderPage: React.FC = () => {
                 }}
               />
               {searchValue && (
-                <button type="button" onClick={handleClear} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+                <button type="button" aria-label="Clear search" onClick={handleClear} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
                   <X size={14} color="#71717a" />
                 </button>
               )}
