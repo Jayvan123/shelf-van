@@ -515,12 +515,11 @@ export const MyShelfPage: React.FC = () => {
                               boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
                               backdropFilter: 'blur(6px)',
                               zIndex: 30,
-                              display: 'flex',
                               flexDirection: 'column',
                               gap: '6px',
                               textAlign: 'center',
                             }}
-                            className="hidden md:flex fade-in"
+                            className="show-md-flex fade-in"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <p
