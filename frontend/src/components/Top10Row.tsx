@@ -121,7 +121,7 @@ export const Top10Row: React.FC<Top10RowProps> = ({
         {canScrollLeft && (
           <button
             onClick={() => scroll('left')}
-            className="hidden md:flex"
+            className="show-md-flex"
             style={{
               position: 'absolute',
               left: '-12px',
@@ -158,7 +158,7 @@ export const Top10Row: React.FC<Top10RowProps> = ({
         {canScrollRight && (
           <button
             onClick={() => scroll('right')}
-            className="hidden md:flex"
+            className="show-md-flex"
             style={{
               position: 'absolute',
               right: '-12px',
