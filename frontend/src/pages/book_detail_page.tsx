@@ -188,7 +188,7 @@ export const BookDetailPage: React.FC = () => {
         <p style={{ color: '#dc2626', marginBottom: '16px', fontSize: '0.95rem' }}>
           {error instanceof Error ? error.message : 'Unable to load book details.'}
         </p>
-        <Link to="/" style={{ color: '#18181b', fontWeight: '600', textDecoration: 'underline' }}>
+        <Link to="/shelf" style={{ color: '#18181b', fontWeight: '600', textDecoration: 'underline' }}>
           Return to My Shelf
         </Link>
       </div>
