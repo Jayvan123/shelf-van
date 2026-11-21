@@ -251,7 +251,7 @@ export const TrendingMosaicRow: React.FC = () => {
         {canScrollLeft && (
           <button
             onClick={() => scroll('left')}
-            className="hidden md:flex"
+            className="show-md-flex"
             style={{
               position: 'absolute',
               left: '-12px',
@@ -288,7 +288,7 @@ export const TrendingMosaicRow: React.FC = () => {
         {canScrollRight && (
           <button
             onClick={() => scroll('right')}
-            className="hidden md:flex"
+            className="show-md-flex"
             style={{
               position: 'absolute',
               right: '-12px',
